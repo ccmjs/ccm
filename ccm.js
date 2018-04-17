@@ -45,8 +45,8 @@
    * @example
    * // example of a cache containing two resources already loaded
    * {
-   *   'https://akless.github.io/ccm/unit_tests/dummy/hello.html': "Hello, <b>World</b>!",
-   *   'https://akless.github.io/ccm/unit_tests/dummy/script.js': { foo: 'bar' }
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/hello.html': "Hello, <b>World</b>!",
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/script.js': { foo: 'bar' }
    * }
    */
   let cache = {};
@@ -513,14 +513,14 @@
    * @example
    * // example of a wait list for the resource "style.css" for which two ccm.load calls are waiting
    * {
-   *   'https://akless.github.io/ccm/unit_tests/dummy/style.css': [
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css': [
    *     [ ccm.load,
-   *       'https://akless.github.io/ccm/unit_tests/dummy/style.css',
-   *       'https://akless.github.io/ccm/unit_tests/dummy/hello.html'
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css',
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/hello.html'
    *     ],
    *     [ ccm.load,
-   *       'https://akless.github.io/ccm/unit_tests/dummy/script.js',
-   *       'https://akless.github.io/ccm/unit_tests/dummy/style.css'
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/script.js',
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css'
    *     ]
    *   ]
    * }

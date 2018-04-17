@@ -24,7 +24,7 @@ ccm.files[ 'ccm-tests.js' ] = {
           suite.ccm.load( 'http://fh-lsoopjava.de/' + suite.local, () => { if ( !finished ) suite.failed( 'broken SOP security' ); finished = true; } );
           suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.passed(); finished = true; } );
         },
-        'cors': suite => suite.ccm.load( 'https://akless.github.io/ccm/unit_tests/' + suite.local, result => suite.assertSame( suite.expected, result ) ),
+        'cors': suite => suite.ccm.load( 'https://ccmjs.github.io/ccm/unit_tests/' + suite.local, result => suite.assertSame( suite.expected, result ) ),
         'remote': suite => suite.ccm.load( 'https://kaul.inf.h-brs.de/ccm/dummy/html.js', result => suite.assertSame( suite.expected, result ) ),
         'cached': suite => suite.ccm.load( suite.local, () => suite.assertSame( suite.expected, suite.ccm.load( { url: suite.local, ignore_cache: false } ) ) ),
         'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
@@ -134,7 +134,7 @@ ccm.files[ 'ccm-tests.js' ] = {
           suite.ccm.load( 'http://fh-lsoopjava.de/' + suite.local, () => { if ( !finished ) suite.failed( 'broken SOP security' ); finished = true; } );
           suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.passed(); finished = true; } );
         },
-        'cors': suite => suite.ccm.load( 'https://akless.github.io/ccm/unit_tests/' + suite.local, result => suite.assertEquals( suite.expected, result ) ),
+        'cors': suite => suite.ccm.load( 'https://ccmjs.github.io/ccm/unit_tests/' + suite.local, result => suite.assertEquals( suite.expected, result ) ),
         'cached': suite => suite.ccm.load( suite.local, () => suite.assertEquals( suite.expected, suite.ccm.load( { url: suite.local, ignore_cache: false } ) ) ),
         'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
         'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) ),
@@ -1232,7 +1232,7 @@ ccm.files[ 'ccm-tests.js' ] = {
     onFinish: {
       tests: {
         'login': suite => {
-          suite.ccm.instance( 'https://akless.github.io/ccm-components/user/versions/ccm.user-2.0.0.js', user =>
+          suite.ccm.instance( 'https://ccmjs.github.io/ccm-components/user/versions/ccm.user-2.0.0.js', user =>
             user.logout( () =>
               suite.$.onFinish( { user: user, onfinish: { login: true, callback: () =>
                 suite.assertTrue( user.isLoggedIn() )
@@ -1319,7 +1319,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       },
       store: {
         setup: ( suite, callback ) => {
-          suite.ccm.instance( 'https://akless.github.io/ccm-components/user/versions/ccm.user-2.0.1.js', user => {
+          suite.ccm.instance( 'https://ccmjs.github.io/ccm-components/user/versions/ccm.user-2.0.1.js', user => {
             suite.settings = { store: 'test', key: 'test' };
             suite.ccm.store( { store: 'test', parent: { user: user } }, store => { suite.store = store; callback(); } );
           } );
@@ -1376,7 +1376,7 @@ ccm.files[ 'ccm-tests.js' ] = {
         'someProperties': function ( suite ) {
           suite.ccm.instance( {
             name: 'dummy1',
-            ccm: 'https://akless.github.io/ccm/ccm.js',
+            ccm: 'https://ccmjs.github.io/ccm/ccm.js',
             config: { foo: 'abc', bar: 'xyz' },
             Instance: function () {
               var self = this;
@@ -1395,7 +1395,7 @@ ccm.files[ 'ccm-tests.js' ] = {
         'allProperties': function ( suite ) {
           suite.ccm.instance( {
             name: 'dummy2',
-            ccm: 'https://akless.github.io/ccm/ccm.js',
+            ccm: 'https://ccmjs.github.io/ccm/ccm.js',
             config: { foo: 'abc', bar: 'xyz' },
             Instance: function () {
               var self = this;
@@ -1429,7 +1429,7 @@ ccm.files[ 'ccm-tests.js' ] = {
     },
     solveDependency: {
       setup: function ( suite, callback ) {
-        suite.url = 'https://akless.github.io/ccm/unit_tests/dummy/style.css';
+        suite.url = 'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css';
         suite.obj_key = 'dummy';
         callback();
       },

@@ -2,12 +2,17 @@
  * @overview <i>ccm</i> framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version 15.0.0
+ * @version 13.1.0
  * @changes
- * version 15.0.0 (17.01.2018): update ccm.load
- * - {"method":"JSONP"} instead of {"jsonp":true} in a Resource Data Object for using JSONP
- * - bugfix for using HTTP method POST
- * (for older version changes see ccm-14.3.0.js)
+ * version 13.1.0 (03.01.2018): consider HTTP parameters and HTTP method when loading HTML and JSON files via ccm.load
+ * version 13.0.0 (29.12.2017): modernisation of ccm.load
+ * - reorganization of the code
+ * - uses ECMAScript 6 syntax
+ * - no manipulation of passed original parameters
+ * - default used HTTP method is POST
+ * - improved avoidance of duplicate loading of a resource
+ * - accepted image file extensions for image preloading are 'jpg', 'jpeg', 'gif', 'png', 'svg' and 'bmp'
+ * (for older version changes see ccm-12.12.0.js)
  */
 
 {
@@ -18,8 +23,8 @@
    * @example
    * // example of a cache containing two resources already loaded
    * {
-   *   'https://akless.github.io/ccm/unit_tests/dummy/hello.html': "Hello, <b>World</b>!",
-   *   'https://akless.github.io/ccm/unit_tests/dummy/script.js': { foo: 'bar' }
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/hello.html': "Hello, <b>World</b>!",
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/script.js': { foo: 'bar' }
    * }
    */
   let cache = {};
@@ -30,7 +35,7 @@
    * @private
    * @type {Object.<ccm.types.index, ccm.types.component>}
    */
-  const components = {};
+  var components = {};
 
   /**
    * @summary <i>ccm</i> database in IndexedDB
@@ -38,7 +43,7 @@
    * @private
    * @type {object}
    */
-  let db;
+  var db;
 
   /**
    * @summary created <i>ccm</i> datastores
@@ -46,7 +51,7 @@
    * @private
    * @type {Object.<ccm.types.source, ccm.Datastore>}
    */
-  let stores = {};
+  var stores = {};
 
   /**
    * Contains the waiting lists of the resources being loaded.
@@ -55,14 +60,14 @@
    * @example
    * // example of a wait list for the resource "style.css" for which two ccm.load calls are waiting
    * {
-   *   'https://akless.github.io/ccm/unit_tests/dummy/style.css': [
+   *   'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css': [
    *     [ ccm.load,
-   *       'https://akless.github.io/ccm/unit_tests/dummy/style.css',
-   *       'https://akless.github.io/ccm/unit_tests/dummy/hello.html'
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css',
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/hello.html'
    *     ],
    *     [ ccm.load,
-   *       'https://akless.github.io/ccm/unit_tests/dummy/script.js',
-   *       'https://akless.github.io/ccm/unit_tests/dummy/style.css'
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/script.js',
+   *       'https://ccmjs.github.io/ccm/unit_tests/dummy/style.css'
    *     ]
    *   ]
    * }
@@ -104,7 +109,7 @@
     this.init = function ( callback ) {
 
       // privatize security relevant members
-      my = self.helper.privatize( that, 'source', 'local', 'store', 'url', 'db', 'socket', 'user', 'method' );
+      my = self.helper.privatize( that, 'source', 'local', 'store', 'url', 'db', 'socket', 'user' );
 
       // set getter method for ccm datastore source
       that.source = function () { return my.source; };
@@ -878,7 +883,7 @@
      */
     function useHttp( data, callback ) {
 
-      self.load( { url: my.url, params: data, method: my.method }, callback );
+      self.load( { url: my.url, params: data }, callback );
 
     }
 
@@ -917,7 +922,7 @@
     components: {},
 
     /**
-     * callbacks for cross domain data exchanges via ccm.load
+     * callbacks for cross domain data exchanges
      * @type {Object.<string, function>}
      */
     callbacks: {},
@@ -940,7 +945,7 @@
      * version number of the framework
      * @type {ccm.types.version}
      */
-    version: function () { return '15.0.0'; },
+    version: function () { return '13.1.0'; },
 
     /**
      * @summary reset caches for resources and datastores
@@ -1011,6 +1016,10 @@
         // has resource URL instead of resource data? => use resource data which contains only the URL information
         if ( !self.helper.isObject( resource ) ) resource = { url: resource };
 
+        // remove ".min" from the resource URL and remember the original URL
+        resource.original = resource.url;
+        resource.url = resource.url.replace( '.min.', '.' );
+
         /**
          * file extension from the URL of the resource
          * @type {string}
@@ -1023,14 +1032,11 @@
         // given resource context is a ccm instance? => load resource in the shadow root context of that instance
         if ( self.helper.isInstance( resource.context ) ) resource.context = resource.context.element.parentNode;
 
-        // determine the operation for loading the resource
-        const operation = getOperation();
+        // loading a CSS file, but not in the global <head>? => ignore cache (to support loading the same CSS file in different contexts)
+        if ( suffix === 'css' && resource.context !== document.head ) resource.ignore_cache = true;
 
-        // loading of CSS, but not in the global <head>? => ignore cache (to support loading the same CSS file in different contexts)
-        if ( operation === loadCSS && resource.context !== document.head ) resource.ignore_cache = true;
-
-        // by default, no caching for loading data
-        if ( operation === loadData && resource.ignore_cache === undefined ) resource.ignore_cache = true;
+        // no caching for loading data
+        if ( resource.params || resource.jsonp ) resource.ignore_cache = true;
 
         // avoid loading a resource twice
         if ( caching() ) return;
@@ -1038,8 +1044,30 @@
         // is the resource loaded for the first time? => mark the resource as "loading" in the cache
         if ( cache[ resource.url ] === undefined ) cache[ resource.url ] = null;
 
-        // start loading of the resource
-        operation();
+        // is it a data exchange? => perform data exchange
+        if ( resource.params || resource.jsonp ) return exchangeData();
+
+        // check file extension from the URL of the resource => load the appropriate type of resource
+        switch ( suffix ) {
+          case 'html':
+            return loadHTML();
+          case 'css':
+            return loadCSS();
+          case 'jpg':
+          case 'jpeg':
+          case 'gif':
+          case 'png':
+          case 'svg':
+          case 'bmp':
+            return loadImage();
+          case 'json':
+            return loadJSON();
+          default:
+            if ( /.*\/css\?.*/.test( resource.url ) )
+              loadCSS();                               // loading of a (Google) font
+            else
+              loadJS();
+        }
 
         /**
          * loads resources serially (recursive function)
@@ -1068,37 +1096,6 @@
           }
           // serially loading of resources completed => check if all resources of this ccm.load call are loaded
           else check();
-
-        }
-
-        /**
-         * determines the operation for loading the resource
-         * @returns {function}
-         */
-        function getOperation() {
-
-          switch ( resource.type ) {
-            case 'css':   return loadCSS;
-            case 'image': return loadImage;
-            case 'data':  return loadData;
-            case 'js':    return loadJS;
-          }
-
-          switch ( suffix ) {
-            case 'css':
-              return loadCSS;
-            case 'jpg':
-            case 'jpeg':
-            case 'gif':
-            case 'png':
-            case 'svg':
-            case 'bmp':
-              return loadImage;
-            case 'js':
-              return loadJS;
-            default:
-              return loadData;
-          }
 
         }
 
@@ -1147,11 +1144,59 @@
 
         }
 
+        /** performs a data exchange */
+        function exchangeData() {
+
+          // should JSONP be used? => use JSONP for data exchange
+          if ( resource.jsonp ) return jsonp();
+
+          // exchange data with server via AJAX request
+          ajax( {
+            url: resource.original,
+            method: resource.method,
+            data: resource.params,
+            callback: successData
+          } );
+
+          /** performs a data exchange via JSONP */
+          function jsonp() {
+
+            // prepare callback function
+            const callback = 'callback' + self.helper.generateKey();
+            if ( !resource.params ) resource.params = {};
+            resource.params.callback = 'ccm.callbacks.' + callback;
+            ccm.callbacks[ callback ] = data => {
+              resource.context.removeChild( element );
+              delete ccm.callbacks[ callback ];
+              successData( data );
+            };
+
+            // prepare the <script> element for data exchange
+            let element = { tag: 'script', src: buildURL( resource.original, resource.params ) };
+            if ( resource.attr ) self.helper.integrate( resource.attr, element );
+            element = self.helper.html( element );
+            element.src = element.src.replace( /&amp;/g, '&' );  // TODO: Why is this "&amp;" happening in ccm.helper.html?
+
+            // start the data exchange
+            resource.context.appendChild( element );
+
+          }
+
+        }
+
+        /** loads the content of an HTML file */
+        function loadHTML() {
+
+          // load the file content via AJAX request
+          ajax( { url: resource.original, type: 'html', method: resource.method, params: resource.params, callback: successData } );
+
+        }
+
         /** loads (and executes) a CSS file */
         function loadCSS() {
 
           // load the CSS file via a <link> element
-          let element = { tag: 'link', rel: 'stylesheet', type: 'text/css', href: resource.url };
+          let element = { tag: 'link', rel: 'stylesheet', type: 'text/css', href: resource.original };
           if ( resource.attr ) self.helper.integrate( resource.attr, element );
           element = self.helper.html( element );
           resource.context.appendChild( element );
@@ -1165,7 +1210,7 @@
           // (pre)load the image file via an image object
           const image = new Image();
           image.onload = success;
-          image.src = resource.url;
+          image.src = resource.original;
 
         }
 
@@ -1176,13 +1221,13 @@
            * filename of the JavaScript file (without '.min')
            * @type {string}
            */
-          const filename = resource.url.split( '/' ).pop().replace( '.min.', '.' );
+          const filename = resource.url.split( '/' ).pop();
 
           // mark JavaScript file as loading
           ccm.files[ filename ] = null;
 
           // load the JavaScript file via a <script> element
-          let element = { tag: 'script', src: resource.url };
+          let element = { tag: 'script', src: resource.original };
           if ( resource.attr ) self.helper.integrate( resource.attr, element );
           element = self.helper.html( element );
           resource.context.appendChild( element );
@@ -1204,70 +1249,57 @@
 
         }
 
-        /** performs a data exchange */
-        function loadData() {
+        /** loads the data content of a JSON file */
+        function loadJSON() {
 
-          // no HTTP method set? => use 'GET'
-          if ( !resource.method ) resource.method = 'GET';
+          // load the data content via AJAX request
+          ajax( { url: resource.original, type: 'json', method: resource.method, params: resource.params, callback: successData } );
 
-          // should JSONP be used? => load data via JSONP, otherwise via AJAX request
-          if ( resource.method === 'JSONP' ) jsonp(); else ajax();
+        }
 
-          /** performs a data exchange via JSONP */
-          function jsonp() {
-
-            // prepare callback function
-            const callback = 'callback' + self.helper.generateKey();
-            if ( !resource.params ) resource.params = {};
-            resource.params.callback = 'ccm.callbacks.' + callback;
-            ccm.callbacks[ callback ] = data => {
-              resource.context.removeChild( element );
-              delete ccm.callbacks[ callback ];
-              successData( data );
-            };
-
-            // prepare the <script> element for data exchange
-            let element = { tag: 'script', src: buildURL( resource.url, resource.params ) };
-            if ( resource.attr ) self.helper.integrate( resource.attr, element );
-            element = self.helper.html( element );
-            element.src = element.src.replace( /&amp;/g, '&' );  // TODO: Why is this "&amp;" happening in ccm.helper.html?
-
-            // start the data exchange
-            resource.context.appendChild( element );
-
+        /**
+         * performs an AJAX request
+         * @param {object} settings - settings for the AJAX request
+         * @param {string} [settings.type] - expected data type of the result (for example, 'text/html' or 'application/javascript')
+         * @param {boolean} [settings.async=true] - request is executed asynchronously (set by default)
+         * @param {string} [settings.method='POST'] - HTTP method to use: 'GET' or 'POST' (default is 'POST')
+         * @param {string} settings.url - URL
+         * @param {string} settings.data - HTTP parameters to send
+         */
+        function ajax( settings ) {
+          switch ( settings.type ) {
+            case 'html': settings.type = 'text/html'; break;
+            case 'json': settings.type = 'application/javascript'; break;
           }
+          settings.async = settings.async === undefined ? true : !!settings.async;
+          const request = new XMLHttpRequest();
+          request.open( settings.method || 'POST', buildURL( settings.url, settings.data ), !!settings.async );
+          if ( settings.type ) request.setRequestHeader( 'Content-type', settings.type );
+          request.onreadystatechange = () => {
+            if( request.readyState == 4 && request.status == 200 )
+              settings.callback( self.helper.regex( 'json' ).test( request.responseText ) ? JSON.parse( request.responseText ) : request.responseText );
+          };
+          request.send();
+        }
 
-          /** performs an AJAX request */
-          function ajax() {
-            const request = new XMLHttpRequest();
-            request.open( resource.method, resource.method === 'GET' ? buildURL( resource.url, resource.params ) : resource.url, true );
-            request.onreadystatechange = () => {
-              if( request.readyState === 4 && request.status === 200 )
-                successData( self.helper.regex( 'json' ).test( request.responseText ) ? JSON.parse( request.responseText ) : request.responseText );
-            };
-            request.send( resource.method === 'POST' ? JSON.stringify( resource.params ) : undefined );
-          }
-
-          /**
-           * adds the parameters in the URL
-           * @param {string} url - URL
-           * @param {object} data - HTTP parameters
-           * @returns {string} finished URL
-           */
-          function buildURL( url, data ) {
-            return data ? url + '?' + params( data ).slice( 0, -1 ) : url;
-            function params( obj, prefix ) {
-              let result = '';
-              for ( const i in obj ) {
-                const key = prefix ? prefix + '[' + encodeURIComponent( i ) + ']' : encodeURIComponent( i );
-                if ( typeof( obj[ i ] ) === 'object' )
-                  result += params( obj[ i ], key );
-                else
-                  result += key + '=' + encodeURIComponent( obj[ i ] ) + '&';
-              }
-              return result;
+        /**
+         * adds the parameters in the URL
+         * @param {string} url - URL
+         * @param {object} data - HTTP parameters
+         * @returns {string} finished URL
+         */
+        function buildURL( url, data ) {
+          return data ? url + '?' + params( data ).slice( 0, -1 ) : url;
+          function params( obj, prefix ) {
+            let result = '';
+            for ( const i in obj ) {
+              const key = prefix ? prefix + '[' + encodeURIComponent( i ) + ']' : encodeURIComponent( i );
+              if ( typeof( obj[ i ] ) === 'object' )
+                result += params( obj[ i ], key );
+              else
+                result += key + '=' + encodeURIComponent( obj[ i ] ) + '&';
             }
-
+            return result;
           }
 
         }
@@ -1278,11 +1310,8 @@
          */
         function successData( data ) {
 
-          // received data is a JSON string? => parse it to JSON
-          if ( typeof data === 'string' && ( data.charAt( 0 ) === '[' || data.charAt( 0 ) === '{' ) ) data = JSON.parse( data );
-
           // add received data to the results of the ccm.load call and to the cache
-          results[ i ] = cache[ resource.url ] = self.helper.protect( data );
+          results[ i ] = cache[ resource.url ] = data;
 
           // perform success callback
           success();
@@ -1293,7 +1322,7 @@
         function success() {
 
           // is there no result value yet? => use the URL as the result of the ccm.load call and the cache
-          if ( results[ i ] === undefined ) results[ i ] = cache[ resource.url ] = resource.url;
+          if ( results[ i ] === undefined ) results[ i ] = cache[ resource.url ] = resource.original;
 
           // is there a waiting list for the loaded resource? => perform waiting ccm.load calls
           if ( waiting_lists[ resource.url ] )
@@ -1867,7 +1896,7 @@
 
                 function setContext( resources ) {
                   for ( var i = 0; i < resources.length; i++ ) {
-                    if ( Array.isArray( resources[ i ] ) ) { setContext( resources[ i ] ); continue; }
+                    if ( Array.isArray( resources[ i ] ) ) return setContext( resources[ i ] );
                     if ( !self.helper.isObject( resources[ i ] ) ) resources[ i ] = { url: resources[ i ] };
                     if ( !resources[ i ].context ) resources[ i ].context = instance.element.parentNode;
                   }
@@ -2585,32 +2614,20 @@
 
       },
 
-      dataset: ( store, key, callback ) => {
-        let user;
+      dataset: function ( store, key, callback ) {
         if ( typeof key === 'function' ) {
           callback = key;
           if ( store.store ) {
             key = store.key;
             store = store.store;
-            user = store.user;
           }
           else return callback( store );
         }
-        if ( self.helper.isInstance( user ) ) user.login( proceed ); else proceed();
-        function proceed() {
-          if ( !key ) key = self.helper.generateKey();
-          if ( self.helper.isInstance( user ) ) key = [ instance.user.data().id, key ];
-          store.get( key, dataset => {
-            callback( dataset === null ? { key: key } : dataset );
-          } );
-        }
+        if ( !key ) key = self.helper.generateKey();
+        store.get( key, function ( dataset ) {
+          callback( dataset === null ? { key: key } : dataset );
+        } );
       },
-
-      /*
-      // prepare dataset key
-      if ( settings.store.key && !dataset.key ) dataset.key = settings.store.key;
-      if ( settings.store.user && instance.user && instance.user.isLoggedIn() ) dataset.key = [ instance.user.data().id, dataset.key || self.helper.generateKey() ];
-      */
 
       decode: function ( obj ) {
 
@@ -3525,9 +3542,6 @@
         // no finish callback? => abort
         if ( !settings ) return;
 
-        // no result data and the instance has a method 'getValue'? => get result data from that method
-        if ( results === undefined && instance.getValue ) results = instance.getValue();
-
         // has only function? => abort and call it as finish callback
         if ( typeof settings === 'function' ) return settings( instance, results );
 
@@ -3773,22 +3787,6 @@
 
       removeElement: function ( element ) {
         if ( element.parentNode ) element.parentNode.removeChild( element );
-      },
-
-      /**
-       * renames the property name of an object
-       * @param obj - the object that contains the property name
-       * @param before - old property name
-       * @param after - new property name
-       * @example
-       * const obj = { foo: 5711 };
-       * ccm.helper.renameProperty( obj, 'foo', 'bar' );
-       * console.log( obj );  // => { "bar": 5711 }
-       */
-      renameProperty: ( obj, before, after ) => {
-        if ( obj[ before ] === undefined ) return delete obj[ before ];
-        obj[ after ] = obj[ before ];
-        delete obj[ before ];
       },
 
       replace: ( newnode, oldnode ) => {
@@ -4197,8 +4195,9 @@
    * @summary <i>ccm</i> resource data
    * @property {string} url - URL of the resource
    * @property {Element} [context=document.head] - context in which the resource should be loaded (default is <head>)
-   * @property {string} [method='GET'] - HTTP method to use: 'GET', 'POST' or 'JSONP' (default is 'GET')
+   * @property {string} [method='POST'] - HTTP method to use: 'GET' or 'POST' (default is 'POST')
    * @property {object} [params] - HTTP parameters to send (in the case of a data exchange)
+   * @property {boolean} [jsonp] - use JSONP (only relevant in case of data exchange)
    * @property {obj} [attr] - HTML attributes to be set for the HTML tag that loads the resource
    * @property {boolean} [ignore_cache] - ignore any result already cached by <i>ccm</i>
    */
