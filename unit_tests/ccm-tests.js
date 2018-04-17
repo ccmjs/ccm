@@ -1232,7 +1232,7 @@ ccm.files[ 'ccm-tests.js' ] = {
     onFinish: {
       tests: {
         'login': suite => {
-          suite.ccm.instance( 'https://ccmjs.github.io/ccm-components/user/versions/ccm.user-2.0.0.js', user =>
+          suite.ccm.instance( 'https://ccmjs.github.io/akless-components/user/versions/ccm.user-2.0.0.js', user =>
             user.logout( () =>
               suite.$.onFinish( { user: user, onfinish: { login: true, callback: () =>
                 suite.assertTrue( user.isLoggedIn() )
@@ -1319,7 +1319,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       },
       store: {
         setup: ( suite, callback ) => {
-          suite.ccm.instance( 'https://ccmjs.github.io/ccm-components/user/versions/ccm.user-2.0.1.js', user => {
+          suite.ccm.instance( 'https://ccmjs.github.io/akless-components/user/versions/ccm.user-2.0.1.js', user => {
             suite.settings = { store: 'test', key: 'test' };
             suite.ccm.store( { store: 'test', parent: { user: user } }, store => { suite.store = store; callback(); } );
           } );
