@@ -2248,7 +2248,7 @@
               if ( input.hasAttribute( 'multiple' ) ) data[ key ] = self.helper.decodeObject( data[ key ] );
               [ ...input.querySelectorAll( 'option' ) ].map( option => {
                 if ( input.hasAttribute( 'multiple' ) )
-                  data[ key ].map( value => { value = self.helper.encode( value ); if ( value === ( option.value ? option.value : option.innerHTML.trim() ) ) option.selected = true; } );
+                  data[ key ].map( value => { value = self.helper.encodeObject( value ); if ( value === ( option.value ? option.value : option.innerHTML.trim() ) ) option.selected = true; } );
                 else if ( data[ key ] === ( option.value ? option.value : option.innerHTML.trim() ) )
                   option.selected = true;
               } );
