@@ -2157,7 +2157,7 @@
        */
       encodeObject: ( obj, inner ) => {
 
-        if ( typeof obj !== 'object' ) return;
+        if ( typeof obj !== 'object' ) return obj;
         if ( !inner ) return JSON.stringify( obj ).replace( /"/g, "'" );
         for ( const key in obj )
           if ( typeof obj[ key ] === 'object' )
