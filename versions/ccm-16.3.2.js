@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.3.2)
+ * @version 16.3.2
  * @changes
  * version 16.3.2 (27.04.2018):
  * - bugfix for using IndexedDB
