@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.5.0)
+ * @version 16.5.0
  * @changes
  * version 16.5.0 (01.05.2018):
  * - default update method for instances if instance.update is boolean true
