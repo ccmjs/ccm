@@ -1417,10 +1417,8 @@
 
                   mutations.forEach( function ( mutation ) {
 
-                    if ( mutation.type === 'attributes' ) {
-                      console.log( "attributes changed", mutation, mutation.attributeName, instance );
+                    if ( mutation.type === 'attributes' )
                       instance.update( mutation.attributeName, instance.root.getAttribute( mutation.attributeName ) );
-                    }
 
                   } );
 
