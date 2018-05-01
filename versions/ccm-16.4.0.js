@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.4.0)
+ * @version 16.4.0
  * @changes
  * version 16.4.0 (01.05.2018):
  * - watching of HTML attributes of instance root element if instance has an update method
