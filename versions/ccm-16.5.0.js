@@ -1434,6 +1434,7 @@
                     case 'onfinish':
                       break;
                     case 'key':
+                      if ( self.helper.regex( 'json' ).test( value ) ) value = JSON.parse( value );
                       self.helper.isObject( value ) && Object.assign( instance, self.helper.privatize( value ) );
                       instance.start();
                       break;
