@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.5.1)
+ * @version 16.5.1
  * @changes
  * version 16.5.1 (07.05.2018):
  * - bugfix for requesting a dataset that do not exists
