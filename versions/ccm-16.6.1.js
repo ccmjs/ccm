@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.6.1)
+ * @version 16.6.1
  * @changes
  * version 16.6.1 (24.05.2018)
  * - no search for data dependencies inside of other ccm dependencies
