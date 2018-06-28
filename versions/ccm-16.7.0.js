@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (16.7.0)
+ * @version 16.7.0
  * @changes
  * version 16.7.0 (28.06.2018)
  * - ccm.load supports loading of XML files
