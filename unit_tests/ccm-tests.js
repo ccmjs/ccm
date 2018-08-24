@@ -7,289 +7,421 @@
 ccm.files[ 'ccm-tests.js' ] = {
   setup: ( suite, callback ) => {
     suite.ccm.clear();
+    suite.ccm.load.timeout = 300;
     suite.$ = suite.ccm.helper;
     callback();
   },
   load: {
-    html: {
-      setup: ( suite, callback ) => {
-        suite.local = 'dummy/hello.html';
-        suite.expected = 'Hello, <b>World</b>!';
-        callback();
+    setup: ( suite, callback ) => {
+      suite.kaul = 'https://kaul.inf.h-brs.de/ccm/';
+      suite.github = 'https://ccmjs.github.io/ccm/unit_tests/';
+      suite.fhlsoopjava = 'http://fh-lsoopjava.de/';
+      callback();
+    },
+    tests: {
+      'promise': suite => {
+        suite.ccm.load( 'dummy/hello.html' ).then( suite.passed ).catch( () => suite.failed() );
       },
-      tests: {
-        'local': suite => suite.ccm.load( suite.local, result => suite.assertSame( suite.expected, result ) ),
-        'sop': suite => {
-          let finished = false;
-          suite.ccm.load( 'http://fh-lsoopjava.de/' + suite.local, () => { if ( !finished ) suite.failed( 'broken SOP security' ); finished = true; } );
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.passed(); finished = true; } );
-        },
-        'cors': suite => suite.ccm.load( 'https://ccmjs.github.io/ccm/unit_tests/' + suite.local, result => suite.assertSame( suite.expected, result ) ),
-        'remote': suite => suite.ccm.load( 'https://kaul.inf.h-brs.de/ccm/dummy/html.js', result => suite.assertSame( suite.expected, result ) ),
-        'cached': suite => suite.ccm.load( suite.local, () => suite.assertSame( suite.expected, suite.ccm.load( { url: suite.local, ignore_cache: false } ) ) ),
-        'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
-        'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) ),
-        'get': suite => suite.ccm.load( { url: suite.local, method: 'GET' }, result => suite.assertSame( suite.expected, result ) ),
-        'post': suite => {
-          let finished = false;
-          suite.ccm.load( { url: suite.local, method: 'POST' }, result => { if ( !finished ) suite.assertSame( suite.expected, result ); finished = true; } );
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.ccm.helper.isFirefox() ? suite.passed() : suite.failed(); finished = true; } );
-        },
-        'params': suite => suite.ccm.load( { url: suite.local, params: { foo: 'bar' } }, result => suite.assertSame( suite.expected, result ) )
+      'clone': suite => {
+        const resource = { url: 'dummy/hello.html' };
+        suite.ccm.load( resource ).then( () => suite.assertEquals( { url: 'dummy/hello.html' }, resource ) ).catch( () => suite.failed() );
+      },
+      'timeout': suite => {
+        suite.ccm.load.timeout = 1;
+        suite.ccm.load( suite.kaul + 'dummy/hello.html' ).then( () => suite.failed( '' ) ).catch( result => suite.assertSame( 'timeout', result.data ) );
+      },
+      'multiple': suite => {
+        suite.ccm.load(
+          { url: 'dummy/hello.html', type: 'data', method: 'GET' },
+          [
+            'dummy/style.css',
+            'dummy/image.png',
+            [
+              { url: 'dummy/data.json', method: 'GET' },
+              'dummy/script.js'
+            ],
+            'dummy/image.gif'
+          ],
+          'dummy/image.jpg'
+        ).then( result => suite.assertEquals( [
+          'Hello, <b>World</b>!',
+          [
+            'dummy/style.css',
+            'dummy/image.png',
+            [
+              { foo: 'bar' },
+              { foo: 'bar' }
+            ],
+            'dummy/image.gif'
+          ],
+          'dummy/image.jpg'
+        ], result ) ).catch( () => suite.failed() );
+      },
+      'error': suite => {
+        suite.ccm.load( 'dummy/hello.html', 'foo', [ 'bar', 'dummy/style.css', [ 'baz', 'dummy/image.png' ] ] ).then( () => suite.failed() ).catch( result => {
+          if (  suite.$.isLoadError( result[ 0 ]           ) ) return suite.failed();
+          if ( !suite.$.isLoadError( result[ 1 ]           ) ) return suite.failed();
+          if ( !suite.$.isLoadError( result[ 2 ][ 0 ]      ) ) return suite.failed();
+          if (  suite.$.isLoadError( result[ 2 ][ 1 ]      ) ) return suite.failed();
+          if ( !suite.$.isLoadError( result[ 2 ][ 2 ][ 0 ] ) ) return suite.failed();
+          if (  suite.$.isLoadError( result[ 2 ][ 2 ][ 1 ] ) ) return suite.failed();
+          suite.passed();
+        } );
+      },
+      'duplicates': suite => {
+        Promise.all( [
+          suite.ccm.load( 'dummy/style.css', 'dummy/style.css', 'dummy/style.css' ),
+          suite.ccm.load( 'dummy/style.css', 'dummy/style.css', 'dummy/style.css' )
+        ] ).then( result => suite.assertEquals( [
+          [ 'dummy/style.css', 'dummy/style.css', 'dummy/style.css' ],
+          [ 'dummy/style.css', 'dummy/style.css', 'dummy/style.css' ]
+        ], result ) ).catch( () => suite.failed() )
       }
     },
-    css: {
+    html: {
       setup: ( suite, callback ) => {
-        suite.local = 'dummy/style.css';
-        suite.check = ( url, context ) => ( context || document ).querySelector( 'link[href="' + url + '"]' );
-        suite.msg = 'already present';
+        suite.path            = 'dummy/hello.html';
+        suite.path_notype     = 'dummy/html';
+        suite.path_js         = 'dummy/html.js';
+        suite.path_php_mime   = 'dummy/html.php';
+        suite.path_php_echo   = 'dummy/hello.php';
+        suite.expected_inner  = 'World';
+        suite.expected_string = 'Hello, <b>World</b>!';
         callback();
       },
-      tests: {
-        'local': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          suite.ccm.load( suite.local, () => suite.assertTrue( suite.check( suite.local, document.head ) ) );
+      local: {
+        tests: {
+          'import':    suite => suite.ccm.load(        suite.path                                         ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'type':      suite => suite.ccm.load( { url: suite.path_notype, type: 'html'                  } ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'get':       suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'GET'   } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'post':      suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'POST'  } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed( suite.$.isFirefox() ? 'Browser-specific: Firefox does not seem to support POST requests on localhost' : '' ) ),
+          'fetch':     suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'fetch' } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'integrity': suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-Et5fUzsiL9JR7DeW13eYkuGEZ6gVtIbceVBzL7IqwKDyzSenWi5O5GPNlfZuzbmC', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt':   suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-Et5fUzsiL9JR7DeW13eYkuGEZ6gVtIbceVBzL7IqwKDyzSenWi5O5GPNlfZuzbmD', crossorigin: 'anonymous' } } ).then( () => suite.failed( 'Browser not supports SRI on HTML Import' ) ).catch( suite.passed ),
+          'jsonp_js':  suite => suite.ccm.load( { url: suite.path_js,     type: 'js'                    } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path_sop      = suite.fhlsoopjava + suite.path;
+          suite.path          = suite.kaul        + suite.path;
+          suite.path_notype   = suite.github      + suite.path_notype;
+          suite.path_php_mime = suite.kaul        + suite.path_php_mime;
+          suite.path_php_echo = suite.kaul        + suite.path_php_echo;
+          callback();
         },
-        'remote': suite => {
-          suite.remote = 'https://kaul.inf.h-brs.de/ccm/' + suite.local;
-          if ( suite.check( suite.remote ) ) return suite.failed( suite.msg );
-          suite.ccm.load( suite.remote, () => suite.assertTrue( suite.check( suite.remote, document.head ) ) );
-        },
-        'returnValue': suite => suite.ccm.load( suite.local, result => suite.assertSame( suite.local, result ) ),
-        'cached': suite => suite.ccm.load( suite.local, () => suite.assertSame( suite.local, suite.ccm.load( suite.local ) ) ),
-        'notCached': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          suite.assertSame( undefined, suite.ccm.load( suite.local ) );
-        },
-        'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) ),
-        'noCacheContext': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, context: document.body } ) ) ),
-        'context': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          let element = document.createElement( 'div' );
-          document.body.appendChild( element );
-          suite.ccm.load( { url: suite.local, context: element }, () => {
-            if ( suite.check( suite.local, document.head ) ) return suite.failed( suite.msg );
-            suite.assertTrue( suite.check( suite.local, element ) );
-          } );
-        },
-        'on-the-fly': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          let finished = false;
-          let element = document.createElement( 'div' );
-          suite.ccm.load( { url: suite.local, context: element }, () => { if ( !finished ) suite.failed( 'CSS loaded on-the-fly' ); finished = true; } );
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.passed(); finished = true; } );
-        },
-        'head': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          suite.ccm.load( { url: suite.local, context: 'head' }, () => {
-            suite.assertTrue( suite.check( suite.local, document.head ) );
-          } );
-        },
-        'shadow': suite => {
-          let shadow = document.createElement( 'div' );
-          document.body.appendChild( shadow );
-          shadow = shadow.attachShadow( { mode: 'open' } );
-          suite.ccm.load( { url: suite.local, context: shadow }, () => {
-            if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-            suite.assertTrue( suite.check( suite.local, shadow ) );
-          } );
-        },
-        'instance': suite => {
-          if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-          const element = document.createElement( 'div' );
-          document.body.appendChild( element );
-          suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, element, instance => suite.ccm.load( { url: suite.local, context: instance }, () => {
-            if ( suite.check( suite.local ) ) return suite.failed( suite.msg );
-            suite.assertTrue( suite.check( suite.local, instance.element.parentNode ) );
-          } ) );
+        tests: {
+          'import':           suite => suite.ccm.load(        suite.path                                           ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'type':             suite => suite.ccm.load( { url: suite.path_notype,   type: 'html'                  } ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'get':              suite => suite.ccm.load( { url: suite.path,          type: 'data', method: 'GET'   } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'post':             suite => suite.ccm.load( { url: suite.path,          type: 'data', method: 'POST'  } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'fetch':            suite => suite.ccm.load( { url: suite.path,          type: 'data', method: 'fetch' } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'integrity':        suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-Et5fUzsiL9JR7DeW13eYkuGEZ6gVtIbceVBzL7IqwKDyzSenWi5O5GPNlfZuzbmC', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt':          suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-Et5fUzsiL9JR7DeW13eYkuGEZ6gVtIbceVBzL7IqwKDyzSenWi5O5GPNlfZuzbmD', crossorigin: 'anonymous' } } ).then( () => suite.failed( 'Browser not supports SRI on HTML Import' ) ).catch( suite.passed ),
+          'jsonp_js':         suite => suite.ccm.load( { url: suite.path_js,       type: 'js'                    } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'jsonp_php':        suite => suite.ccm.load( { url: suite.path_php_echo, type: 'data', method: 'JSONP' } ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'php_mime_import':  suite => suite.ccm.load( { url: suite.path_php_mime, type: 'html'                  } ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'php_mime_string':  suite => suite.ccm.load(        suite.path_php_mime                                  ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'php_echo_import':  suite => suite.ccm.load( { url: suite.path_php_mime, type: 'html'                  } ).then( result => suite.assertSame( suite.expected_inner,  result.querySelector( 'b' ).innerHTML ) ).catch( () => suite.failed() ),
+          'php_echo_string':  suite => suite.ccm.load(        suite.path_php_echo                                  ).then( result => suite.assertSame( suite.expected_string, result                                ) ).catch( () => suite.failed() ),
+          'sop':              suite => suite.ccm.load(        suite.path_sop                                       ).then( () => suite.failed() ).catch( suite.passed )
         }
       }
     },
     image: {
       setup: ( suite, callback ) => {
-        suite.local = 'dummy/image.png';
+        suite.path_jpg    = 'dummy/image.jpg';
+        suite.path_jpeg   = 'dummy/image.jpeg';
+        suite.path_gif    = 'dummy/image.gif';
+        suite.path_png    = 'dummy/image.png';
+        suite.path_svg    = 'dummy/image.svg';
+        suite.path_bmp    = 'dummy/image.bmp';
+        suite.path_notype = 'dummy/image';
+        suite.path_php    = 'dummy/image.php';
         callback();
       },
-      tests: {
-        'local': suite => suite.ccm.load( suite.local, result => suite.assertSame( suite.local, result ) ),
-        'remote': suite => {
-          const remote = 'https://kaul.inf.h-brs.de/ccm/' + suite.local;
-          suite.ccm.load( remote, result => suite.assertSame( remote, result ) );
+      local: {
+        tests: {
+          'jpg':   suite => suite.ccm.load(        suite.path_jpg                     ).then( result => suite.assertSame( suite.path_jpg,    result ) ).catch( () => suite.failed() ),
+          'jpeg':  suite => suite.ccm.load(        suite.path_jpeg                    ).then( result => suite.assertSame( suite.path_jpeg,   result ) ).catch( () => suite.failed() ),
+          'gif':   suite => suite.ccm.load(        suite.path_gif                     ).then( result => suite.assertSame( suite.path_gif,    result ) ).catch( () => suite.failed() ),
+          'png':   suite => suite.ccm.load(        suite.path_png                     ).then( result => suite.assertSame( suite.path_png,    result ) ).catch( () => suite.failed() ),
+          'svg':   suite => suite.ccm.load(        suite.path_svg                     ).then( result => suite.assertSame( suite.path_svg,    result ) ).catch( () => suite.failed() ),
+          'bmp':   suite => suite.ccm.load(        suite.path_bmp                     ).then( result => suite.assertSame( suite.path_bmp,    result ) ).catch( () => suite.failed() ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype, type: 'image' } ).then( result => suite.assertSame( suite.path_notype, result ) ).catch( () => suite.failed() )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path_jpg    = suite.kaul + suite.path_jpg;
+          suite.path_jpeg   = suite.kaul + suite.path_jpeg;
+          suite.path_gif    = suite.kaul + suite.path_gif;
+          suite.path_png    = suite.kaul + suite.path_png;
+          suite.path_svg    = suite.kaul + suite.path_svg;
+          suite.path_bmp    = suite.kaul + suite.path_bmp;
+          suite.path_notype = suite.kaul + suite.path_notype;
+          suite.path_php    = suite.kaul + suite.path_php;
+          callback();
         },
-        'cached': suite => suite.ccm.load( suite.local, () => suite.assertSame( suite.local, suite.ccm.load( suite.local ) ) ),
-        'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
-        'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) )
+        tests: {
+          'jpg':   suite => suite.ccm.load(        suite.path_jpg                     ).then( result => suite.assertSame( suite.path_jpg,    result ) ).catch( () => suite.failed() ),
+          'jpeg':  suite => suite.ccm.load(        suite.path_jpeg                    ).then( result => suite.assertSame( suite.path_jpeg,   result ) ).catch( () => suite.failed() ),
+          'gif':   suite => suite.ccm.load(        suite.path_gif                     ).then( result => suite.assertSame( suite.path_gif,    result ) ).catch( () => suite.failed() ),
+          'png':   suite => suite.ccm.load(        suite.path_png                     ).then( result => suite.assertSame( suite.path_png,    result ) ).catch( () => suite.failed() ),
+          'svg':   suite => suite.ccm.load(        suite.path_svg                     ).then( result => suite.assertSame( suite.path_svg,    result ) ).catch( () => suite.failed() ),
+          'bmp':   suite => suite.ccm.load(        suite.path_bmp                     ).then( result => suite.assertSame( suite.path_bmp,    result ) ).catch( () => suite.failed() ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype, type: 'image' } ).then( result => suite.assertSame( suite.path_notype, result ) ).catch( () => suite.failed() ),
+          'php':   suite => suite.ccm.load( { url: suite.path_php,    type: 'image' } ).then( result => suite.assertSame( suite.path_php,    result ) ).catch( () => suite.failed() )
+        }
       }
     },
-    json: {
+    css: {
       setup: ( suite, callback ) => {
-        suite.local = 'dummy/data.json';
-        suite.expected = { foo: 'bar' };
+        suite.path        = 'dummy/style.css';
+        suite.path_notype = 'dummy/style';
+        suite.path_php    = 'dummy/css.php';
+        suite.check = ( url, context ) => ( context || document ).querySelector( 'link[href="' + url + '"]' );
+        suite.msg = 'already present';
         callback();
       },
-      tests: {
-        'local': suite => suite.ccm.load( suite.local, result => suite.assertEquals( suite.expected, result ) ),
-        'sop': suite => {
-          let finished = false;
-          suite.ccm.load( 'http://fh-lsoopjava.de/' + suite.local, () => { if ( !finished ) suite.failed( 'broken SOP security' ); finished = true; } );
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.passed(); finished = true; } );
+      local: {
+        tests: {
+          'element': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            suite.ccm.load( suite.path ).then( () => suite.assertTrue( suite.check( suite.path, document.head ) ) ).catch( () => suite.failed() );
+          },
+          'value': suite => suite.ccm.load( suite.path ).then( result => suite.assertSame( suite.path, result ) ).catch( () => suite.failed() ),
+          'type': suite => {
+            if ( suite.check( suite.path_notype ) ) return suite.failed( suite.msg );
+            suite.ccm.load( { url: suite.path_notype, type: 'css' } ).then( () => suite.assertTrue( suite.check( suite.path_notype, document.head ) ) ).catch( () => suite.failed( 'Fails on MIME type' ) );
+          },
+          'context': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            let element = document.createElement( 'div' );
+            document.body.appendChild( element );
+            suite.ccm.load( { url: suite.path, context: element } ).then( () => {
+              if ( suite.check( suite.path, document.head ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, element ) );
+            } ).catch( () => suite.failed() );
+          },
+          'on-the-fly': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            let element = document.createElement( 'div' );
+            suite.ccm.load( { url: suite.path, context: element } ).then( () => suite.failed( 'CSS loaded on-the-fly' ) ).catch( () => suite.passed() );
+          },
+          'head': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            suite.ccm.load( { url: suite.path, context: 'head' } ).then( () => suite.assertTrue( suite.check( suite.path, document.head ) ) ).catch( () => suite.failed() );
+          },
+          'shadow': suite => {
+            let element = document.createElement( 'div' );
+            document.body.appendChild( element );
+            element = element.attachShadow( { mode: 'open' } );
+            suite.ccm.load( { url: suite.path, context: element } ).then( () => {
+              if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, element ) );
+            } ).catch( () => suite.failed() );
+          },
+          'instance': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            const element = document.createElement( 'div' );
+            document.body.appendChild( element );
+            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, element, instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
+              if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, instance.element.parentNode ) );
+            } ) );
+          },
+          'integrity': suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt':   suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISB', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path        = suite.kaul + suite.path;
+          suite.path_notype = suite.kaul + suite.path_notype;
+          suite.path_php    = suite.kaul + suite.path_php;
+          callback();
         },
-        'cors': suite => suite.ccm.load( 'https://ccmjs.github.io/ccm/unit_tests/' + suite.local, result => suite.assertEquals( suite.expected, result ) ),
-        'cached': suite => suite.ccm.load( suite.local, () => suite.assertEquals( suite.expected, suite.ccm.load( { url: suite.local, ignore_cache: false } ) ) ),
-        'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
-        'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) ),
-        'get': suite => suite.ccm.load( { url: suite.local, method: 'GET' }, result => suite.assertEquals( suite.expected, result ) ),
-        'post': suite => {
-          let finished = false;
-          suite.ccm.load( { url: suite.local, method: 'POST' }, result => { if ( !finished ) suite.assertEquals( suite.expected, result ); finished = true; } );
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) return suite.ccm.helper.isFirefox() ? suite.passed() : suite.failed(); finished = true; } );
-        },
-        'params': suite => suite.ccm.load( { url: suite.local, params: { foo: 'bar' } }, result => suite.assertEquals( suite.expected, result ) )
+        tests: {
+          'element': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            suite.ccm.load( suite.path ).then( () => suite.assertTrue( suite.check( suite.path, document.head ) ) ).catch( () => suite.failed() );
+          },
+          'value': suite => suite.ccm.load( suite.path ).then( result => suite.assertSame( suite.path, result ) ).catch( () => suite.failed() ),
+          'type': suite => {
+            if ( suite.check( suite.path_notype ) ) return suite.failed( suite.msg );
+            suite.ccm.load( { url: suite.path_notype, type: 'css' } ).then( () => suite.assertTrue( suite.check( suite.path_notype, document.head ) ) ).catch( () => suite.failed() );
+          },
+          'context': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            let element = document.createElement( 'div' );
+            document.body.appendChild( element );
+            suite.ccm.load( { url: suite.path, context: element } ).then( () => {
+              if ( suite.check( suite.path, document.head ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, element ) );
+            } ).catch( () => suite.failed() );
+          },
+          'on-the-fly': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            let element = document.createElement( 'div' );
+            suite.ccm.load( { url: suite.path, context: element } ).then( () => suite.failed( 'CSS loaded on-the-fly' ) ).catch( suite.passed );
+          },
+          'head': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            suite.ccm.load( { url: suite.path, context: 'head' } ).then( () => suite.assertTrue( suite.check( suite.path, document.head ) ) ).catch( () => suite.failed() );
+          },
+          'shadow': suite => {
+            let shadow = document.createElement( 'div' );
+            document.body.appendChild( shadow );
+            shadow = shadow.attachShadow( { mode: 'open' } );
+            suite.ccm.load( { url: suite.path, context: shadow } ).then( () => {
+              if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, shadow ) );
+            } ).catch( () => suite.failed() );
+          },
+          'instance': suite => {
+            if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+            const element = document.createElement( 'div' );
+            document.body.appendChild( element );
+            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, element, instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
+              if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
+              suite.assertTrue( suite.check( suite.path, instance.element.parentNode ) );
+            } ).catch( () => suite.failed() ) );
+          },
+          'integrity': suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt':   suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISB', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed ),
+          'php': suite => {
+            if ( suite.check( suite.path_php ) ) return suite.failed( suite.msg );
+            suite.ccm.load( { url: suite.path_php, type: 'css' } ).then( () => suite.assertTrue( suite.check( suite.path_php, document.head ) ) ).catch( () => suite.failed() );
+          }
+        }
       }
     },
     js: {
       setup: ( suite, callback ) => {
-        suite.local = 'dummy/script.js';
+        suite.path        = 'dummy/script.js';
+        suite.path_min    = 'dummy/script.min.js';
+        suite.path_notype = 'dummy/script';
+        suite.path_php    = 'dummy/js.php';
+        suite.path_module = './dummy/module.js';
         suite.expected = { foo: 'bar' };
         callback();
       },
-      tests: {
-        'local': suite => suite.ccm.load( suite.local, result => suite.assertEquals( suite.expected, result ) ),
-        'remote': suite => suite.ccm.load( 'https://kaul.inf.h-brs.de/ccm/' + suite.local, result => suite.assertEquals( suite.expected, result ) ),
-        'cached': suite => suite.ccm.load( suite.local, () => suite.assertEquals( suite.expected, suite.ccm.load( suite.local ) ) ),
-        'notCached': suite => suite.assertSame( undefined, suite.ccm.load( suite.local ) ),
-        'ignoreCache': suite => suite.ccm.load( suite.local, () => suite.assertSame( undefined, suite.ccm.load( { url: suite.local, ignore_cache: true } ) ) ),
-        'min': suite => suite.ccm.load( 'dummy/script.min.js', result => suite.assertEquals( suite.expected, result ) )
+      local: {
+        tests: {
+          'value':            suite => suite.ccm.load(        suite.path                          ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() ),
+          'min':              suite => suite.ccm.load(        suite.path_min                      ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() ),
+          'type':             suite => suite.ccm.load( { url: suite.path_notype, type: 'js'     } ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed( 'Fails on MIME type' ) ),
+          'module':           suite => suite.ccm.load( { url: suite.path_module, type: 'module' } ).then( result => suite.assertEquals( suite.expected, result.f() ) ).catch( () => suite.failed() ),
+          'integrity_js':     suite => suite.ccm.load( { url: suite.path,                        attr: { integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt_js':       suite => suite.ccm.load( { url: suite.path,                        attr: { integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDV', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed ),
+          'integrity_module': suite => suite.ccm.load( { url: suite.path_module, type: 'module', attr: { integrity: 'sha384-su7F8nDSQhpB2/cQP14Iu2Hr05pGTOjO1WoAb47wbASNVSz+goYOJcVZ0xXMWdQg', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt_module':   suite => suite.ccm.load( { url: suite.path_module, type: 'module', attr: { integrity: 'sha384-su7F8nDSQhpB2/cQP14Iu2Hr05pGTOjO1WoAb47wbASNVSz+goYOJcVZ0xXMWdQh', crossorigin: 'anonymous' } } ).then( () => suite.failed( 'Browser not supports SRI on ES6 Modules' ) ).catch( suite.passed )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path        = suite.kaul + suite.path;
+          suite.path_notype = suite.kaul + suite.path_notype;
+          suite.path_php    = suite.kaul + suite.path_php;
+          suite.path_module = suite.kaul + suite.path_module;
+          callback();
+        },
+        tests: {
+          'value':            suite => suite.ccm.load(        suite.path                          ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() ),
+          'min':              suite => suite.ccm.load(        suite.path_min                      ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() ),
+          'type':             suite => suite.ccm.load( { url: suite.path_notype, type: 'js'     } ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() ),
+          'module':           suite => suite.ccm.load( { url: suite.path_module, type: 'module' } ).then( result => suite.assertEquals( suite.expected, result.f() ) ).catch( () => suite.failed() ),
+          'integrity_js':     suite => suite.ccm.load( { url: suite.path,                        attr: { integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt_js':       suite => suite.ccm.load( { url: suite.path,                        attr: { integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDV', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed ),
+          'integrity_module': suite => suite.ccm.load( { url: suite.path_module, type: 'module', attr: { integrity: 'sha384-su7F8nDSQhpB2/cQP14Iu2Hr05pGTOjO1WoAb47wbASNVSz+goYOJcVZ0xXMWdQg', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
+          'corrupt_module':   suite => suite.ccm.load( { url: suite.path_module, type: 'module', attr: { integrity: 'sha384-su7F8nDSQhpB2/cQP14Iu2Hr05pGTOjO1WoAb47wbASNVSz+goYOJcVZ0xXMWdQh', crossorigin: 'anonymous' } } ).then( () => suite.failed( 'Browser not supports SRI on ES6 Modules' ) ).catch( suite.passed ),
+          'php':              suite => suite.ccm.load( { url: suite.path_php,    type: 'js'     } ).then( result => suite.assertEquals( suite.expected, result     ) ).catch( () => suite.failed() )
+        }
+      }
+    },
+    xml: {
+      setup: ( suite, callback ) => {
+        suite.path        = 'dummy/note.xml';
+        suite.path_notype = 'dummy/note';
+        suite.expected = 'bar';
+        callback();
+      },
+      local: {
+        tests: {
+          'value': suite => suite.ccm.load(        suite.path                       ).then( result => suite.assertEquals( suite.expected, result.getElementsByTagName( 'foo' )[ 0 ].childNodes[ 0 ].nodeValue ) ).catch( () => suite.failed( suite.$.isFirefox() ? 'Browser-specific: Firefox does not seem to support POST requests on localhost' : '' ) ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype, type: 'xml' } ).then( result => suite.assertEquals( suite.expected, result.getElementsByTagName( 'foo' )[ 0 ].childNodes[ 0 ].nodeValue ) ).catch( () => suite.failed( 'Wrong interpretation of file content' ) )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path        = suite.kaul + suite.path;
+          suite.path_notype = suite.kaul + suite.path_notype;
+          callback();
+        },
+        tests: {
+          'value': suite => suite.ccm.load(        suite.path                       ).then( result => suite.assertEquals( suite.expected, result.getElementsByTagName( 'foo' )[ 0 ].childNodes[ 0 ].nodeValue ) ).catch( () => suite.failed() ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype, type: 'xml' } ).then( result => suite.assertEquals( suite.expected, result.getElementsByTagName( 'foo' )[ 0 ].childNodes[ 0 ].nodeValue ) ).catch( () => suite.failed() )
+        }
+      }
+    },
+    json: {
+      setup: ( suite, callback ) => {
+        suite.path        = 'dummy/data.json';
+        suite.path_notype = 'dummy/data';
+        suite.path_jsonp  = 'dummy/script.js';
+        suite.expected = { foo: 'bar' };
+        callback();
+      },
+      local: {
+        tests: {
+          'value': suite => suite.ccm.load( { url: suite.path,                      method: 'GET'   } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype,               method: 'GET'   } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'get':   suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'GET'   } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'post':  suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'POST'  } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed( suite.$.isFirefox() ? 'Browser-specific: Firefox does not seem to support POST requests on localhost' : '' ) ),
+          'fetch': suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'fetch' } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'jsonp': suite => suite.ccm.load( { url: suite.path_jsonp,  type: 'js',   method: 'JSONP' } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() )
+        }
+      },
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path_sop    = suite.fhlsoopjava + suite.path;
+          suite.path        = suite.kaul        + suite.path;
+          suite.path_notype = suite.kaul        + suite.path_notype;
+          suite.path_jsonp  = suite.kaul        + suite.path_jsonp;
+          callback();
+        },
+        tests: {
+          'value': suite => suite.ccm.load(        suite.path                                         ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'type':  suite => suite.ccm.load( { url: suite.path_notype, type: 'data'                  } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'get':   suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'GET'   } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'post':  suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'POST'  } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'fetch': suite => suite.ccm.load( { url: suite.path,        type: 'data', method: 'fetch' } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'jsonp': suite => suite.ccm.load( { url: suite.path_jsonp,  type: 'js',   method: 'JSONP' } ).then( result => suite.assertEquals( suite.expected, result ) ).catch( () => suite.failed() ),
+          'sop':   suite => suite.ccm.load(        suite.path_sop                                     ).then( () => suite.failed() ).catch( suite.passed )
+        }
       }
     },
     data: {
       setup: ( suite, callback ) => {
-        suite.url = 'https://kaul.inf.h-brs.de/ccm/dummy/hello.php';
-        suite.expected = 'Hello, World!';
+        suite.path = 'dummy/hello.php';
+        suite.expected = 'Hello, John!';
         callback();
       },
-      tests: {
-        'default': suite => suite.ccm.load( suite.url, result => suite.assertSame( suite.expected, result ) ),
-        'get':   suite => suite.ccm.load( { url: suite.url, params: { name: 'World' }, method: 'GET'  }, result => suite.assertSame( suite.expected, result ) ),
-        'post':  suite => suite.ccm.load( { url: suite.url, params: { name: 'World' }, method: 'POST' }, result => suite.assertSame( suite.expected, result ) ),
-        'jsonp': suite => suite.ccm.load( { url: suite.url, params: { name: 'World' }, jsonp :  true  }, result => suite.assertSame( suite.expected, result ) ),
-        'notCached': suite => suite.ccm.load( suite.url, () => suite.assertSame( undefined, suite.ccm.load( suite.url ) ) ),
-        'demoLogin': suite => suite.ccm.load( {
-          url: 'https://ccm.inf.h-brs.de',
-          method: 'JSONP',
-          params: { realm: 'ccm' },
-        }, result => suite.assertEquals( [ 'id', 'token' ], Object.keys( result ) ) )
-      }
-    },
-    type: {
-      setup: ( suite, callback ) => {
-        suite.url = 'https://kaul.inf.h-brs.de/ccm/dummy/';
-        callback();
-      },
-      tests: {
-         'staticHTML' : suite => suite.ccm.load(                    'dummy/html'                 , result => suite.assertSame  (  'Hello, <b>World</b>!', result ) ),
-        'dynamicHTML' : suite => suite.ccm.load(        suite.url +   'html.php'                 , result => suite.assertSame  (  'Hello, <b>World</b>!', result ) ),
-        'dynamicCSS'  : suite => suite.ccm.load( { url: suite.url +    'css.php', type: 'css'   }, result => suite.assertSame  ( suite.url +   'css.php', result ) ),
-        'dynamicImage': suite => suite.ccm.load( { url: suite.url +  'image.php', type: 'image' }, result => suite.assertSame  ( suite.url + 'image.php', result ) ),
-         'staticData' : suite => suite.ccm.load(                    'dummy/data'                 , result => suite.assertEquals(          { foo: 'bar' }, result ) ),
-        'dynamicData' : suite => suite.ccm.load(        suite.url +   'data.php'                 , result => suite.assertEquals(          { foo: 'bar' }, result ) ),
-          'jsonpData' : suite => suite.ccm.load( { url: suite.url +   'data.php', jsonp: true   }, result => suite.assertEquals(          { foo: 'bar' }, result ) ),
-        'dynamicJS'   : suite => suite.ccm.load( { url: suite.url +     'js.php', type: 'js'    }, result => suite.assertEquals(          { foo: 'bar' }, result ) )
-      }
-    },
-    subresource_integrity: {
-      setup: ( suite, callback ) => {
-        suite.url = 'dummy/';
-        callback();
-      },
-      tests: {
-        'correctHashCSS': suite => suite.ccm.load( {
-          url: suite.url + 'style.css',
-          attr: {
-            integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA',
-            crossorigin: 'anonymous'
-          }
-        }, result => suite.assertSame( suite.url + 'style.css', result ) ),
-        'wrongHashCSS': suite => {
-          let finished = false;
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) suite.passed(); finished = true; } );
-          suite.ccm.load( {
-            url: suite.url + 'style.css',
-            attr: {
-              integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISB',
-              crossorigin: 'anonymous'
-            }
-          }, result => {
-            if ( !finished )
-              if ( suite.ccm.helper.isSafari() || suite.ccm.helper.isFirefox() )
-                suite.assertSame( suite.url + 'style.css', result );
-              else
-                suite.failed( 'correct hash', result );
-            finished = true;
-          } );
+      remote: {
+        setup: ( suite, callback ) => {
+          suite.path_sop = suite.fhlsoopjava + suite.path;
+          suite.path     = suite.kaul + suite.path;
+          suite.expected = 'Hello, <b>John</b>!';
+          callback();
         },
-        'correctHashJS': suite => {
-          suite.ccm.load( {
-            url: suite.url + 'script.js',
-            attr: {
-              integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW',
-              crossorigin: 'anonymous'
-            }
-          }, result => suite.assertEquals( { foo: 'bar' }, result ) );
-        },
-        'wrongHashJS': suite => {
-          let finished = false;
-          suite.ccm.helper.wait( 300, () => { if ( !finished ) suite.passed(); finished = true; } );
-          suite.ccm.load( {
-            url: suite.url + 'script.js',
-            attr: {
-              integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDX',
-              crossorigin: 'anonymous'
-            }
-          }, result => {
-            if ( !finished )
-              if ( suite.ccm.helper.isSafari() || suite.ccm.helper.isFirefox() )
-                suite.assertEquals( { foo: 'bar' }, result );
-              else
-                suite.failed( 'correct hash', result );
-            finished = true;
-          } );
+        tests: {
+          'get':        suite => suite.ccm.load( { url: suite.path, params: { name: 'John' }, method: 'GET'                             } ).then( result => suite.assertSame( suite.expected, result ) ),
+          'post':       suite => suite.ccm.load( { url: suite.path, params: { name: 'John' }, method: 'POST'                            } ).then( result => suite.assertSame( suite.expected, result ) ),
+          'fetch_get':  suite => suite.ccm.load( { url: suite.path, params: { name: 'John' }, method: 'fetch', init: { method: 'GET'  } } ).then( result => suite.assertSame( suite.expected, result ) ),
+          'fetch_post': suite => suite.ccm.load( { url: suite.path, params: { name: 'John' }, method: 'fetch', init: { method: 'POST' } } ).then( result => suite.assertSame( suite.expected, result ) ),
+          'jsonp':      suite => suite.ccm.load( { url: suite.path, params: { name: 'John' }, method: 'JSONP'                           } ).then( result => suite.assertSame( suite.expected, result ) )
         }
-      }
-    },
-    tests: {
-      'callback': suite => suite.ccm.load( suite.passed ),
-      'clone': suite => {
-        const resource = { url: 'dummy/hello.html' };
-        suite.ccm.load( resource, () => suite.assertEquals( { url: 'dummy/hello.html' }, resource ) );
-      },
-      'array': suite => {
-        suite.ccm.load(
-          'dummy/hello.html',
-          [
-            'dummy/style.css',
-            'dummy/image.png',
-            [
-              'dummy/data.json',
-              'dummy/script.js'
-            ],
-            'dummy/logo.gif'
-          ],
-          'dummy/picture.jpg',
-          result => suite.assertEquals( [
-            'Hello, <b>World</b>!',
-            [
-              'dummy/style.css',
-              'dummy/image.png',
-              [
-                { foo: 'bar' },
-                { foo: 'bar' }
-              ],
-              'dummy/logo.gif'
-            ],
-            'dummy/picture.jpg'
-          ], result )
-        );
       }
     }
   },
@@ -298,17 +430,17 @@ ccm.files[ 'ccm-tests.js' ] = {
       tests: {
         'local': function ( suite ) {
           suite.ccm.store( {}, function ( store ) {
-            suite.assertTrue( suite.ccm.helper.isDatastore( store ) );
+            suite.assertTrue( suite.$.isDatastore( store ) );
           } );
         },
         'client': function ( suite ) {
           suite.ccm.store( { store: 'test' }, function ( store ) {
-            suite.assertTrue( suite.ccm.helper.isDatastore( store ) );
+            suite.assertTrue( suite.$.isDatastore( store ) );
           } );
         },
         'server': function ( suite ) {
           suite.ccm.store( { url: 'https://ccm.inf.h-brs.de', store: 'test' }, function ( store ) {
-            suite.assertTrue( suite.ccm.helper.isDatastore( store ) );
+            suite.assertTrue( suite.$.isDatastore( store ) );
           } );
         }
       }
@@ -425,11 +557,11 @@ ccm.files[ 'ccm-tests.js' ] = {
     arrToObj: {
       tests: {
         'arr': function ( suite ) {
-          suite.assertEquals( { foo: true, bar: true }, suite.ccm.helper.arrToObj( [ 'foo', 'bar' ] ) );
+          suite.assertEquals( { foo: true, bar: true }, suite.$.arrToObj( [ 'foo', 'bar' ] ) );
         },
         'objKey': function ( suite ) {
           var obj = { arr: [ 'foo', 'bar' ] };
-          suite.ccm.helper.arrToObj( obj, 'arr' );
+          suite.$.arrToObj( obj, 'arr' );
           suite.assertEquals( { foo: true, bar: true }, obj.arr );
         }
       }
@@ -437,14 +569,14 @@ ccm.files[ 'ccm-tests.js' ] = {
     cleanObject: {
       tests: {
         'example': function ( suite ) {
-          suite.assertEquals( { foo: 'bar' }, suite.ccm.helper.cleanObject( { foo: 'bar', is: false, i: 0, n: NaN, ref: null, text: '', value: undefined } ) );
+          suite.assertEquals( { foo: 'bar' }, suite.$.cleanObject( { foo: 'bar', is: false, i: 0, n: NaN, ref: null, text: '', value: undefined } ) );
         }
       }
     },
     convertObjectKeys: {
       tests: {
         'example': function ( suite ) {
-          suite.assertEquals( { test: 123, foo: { bar: 'abc', baz: 'xyz' } }, suite.ccm.helper.convertObjectKeys( { test: 123, 'foo.bar': 'abc', 'foo.baz': 'xyz' } ) );
+          suite.assertEquals( { test: 123, foo: { bar: 'abc', baz: 'xyz' } }, suite.$.convertObjectKeys( { test: 123, 'foo.bar': 'abc', 'foo.baz': 'xyz' } ) );
         }
       }
     },
@@ -458,16 +590,16 @@ ccm.files[ 'ccm-tests.js' ] = {
               baz: 'xyz'
             }
           };
-          suite.assertSame( 'abc', suite.ccm.helper.deepValue( obj, 'foo.bar' ) );
+          suite.assertSame( 'abc', suite.$.deepValue( obj, 'foo.bar' ) );
         },
         'setObject': function ( suite ) {
           var obj = {};
-          suite.ccm.helper.deepValue( obj, 'foo.bar', 'abc' );
+          suite.$.deepValue( obj, 'foo.bar', 'abc' );
           suite.assertEquals( { foo: { bar: 'abc' } }, obj );
         },
         'setReturn': function ( suite ) {
           var obj = {};
-          suite.assertSame( 'abc', suite.ccm.helper.deepValue( obj, 'foo.bar', 'abc' ) );
+          suite.assertSame( 'abc', suite.$.deepValue( obj, 'foo.bar', 'abc' ) );
         }
       }
     },
@@ -783,7 +915,7 @@ ccm.files[ 'ccm-tests.js' ] = {
               func: function () {},
               f3: func
             },
-            suite.ccm.helper.format(
+            suite.$.format(
               {
                 is: '%%',
                 abc: {
@@ -821,7 +953,7 @@ ccm.files[ 'ccm-tests.js' ] = {
         'string': function ( suite ) {
           suite.assertEquals(
             'true, Hello, World!, pong, 12, 4711, true',
-            suite.ccm.helper.format( '%%, %text%, %%, %%, %number%, %bool%',
+            suite.$.format( '%%, %text%, %%, %%, %number%, %bool%',
               true,
               'pong',
               {
@@ -835,13 +967,13 @@ ccm.files[ 'ccm-tests.js' ] = {
         },
         'func': function ( suite ) {
           var func = function () {};
-          if ( func !== suite.ccm.helper.format(           func     )     ) return suite.failed();
-          if ( func !== suite.ccm.helper.format( { x:      func   } ).x   ) return suite.failed();
-          if ( func !== suite.ccm.helper.format( { x: { y: func } } ).x.y ) return suite.failed();
+          if ( func !== suite.$.format(           func     )     ) return suite.failed();
+          if ( func !== suite.$.format( { x:      func   } ).x   ) return suite.failed();
+          if ( func !== suite.$.format( { x: { y: func } } ).x.y ) return suite.failed();
           var result;
-          result = suite.ccm.helper.format( { f1: '%func%', f2: '%func%', f3: '%func%' }, { func: func } );
+          result = suite.$.format( { f1: '%func%', f2: '%func%', f3: '%func%' }, { func: func } );
           if ( func !== result.f1 || func !== result.f2 || func !== result.f3 ) return suite.failed();
-          result = suite.ccm.helper.format( { f1: '%%', f2: '%%', f3: '%%' }, func, func, func );
+          result = suite.$.format( { f1: '%%', f2: '%%', f3: '%%' }, func, func, func );
           if ( func !== result.f1 || func !== result.f2 || func !== result.f3 ) return suite.failed();
           suite.passed();
         }
@@ -1104,7 +1236,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       tests: {
         'pseudoProxy': function ( suite ) {
           var value = { component: 'ccm.blank.js' };
-          suite.assertTrue( suite.ccm.helper.isProxy( value ) );
+          suite.assertTrue( suite.$.isProxy( value ) );
         },
         /*
         'realProxy': function ( suite ) {
@@ -1114,24 +1246,24 @@ ccm.files[ 'ccm-tests.js' ] = {
           }, function ( instance ) {
             console.log( instance );
             return suite.failed();
-            if ( !ccm.helper.isProxy( instance.instance_a ) ) return suite.failed( 'instance a must be a proxy' );
-            if (  ccm.helper.isProxy( instance.instance_b ) ) return suite.failed( 'instance b should not be a proxy' );
+            if ( !$.isProxy( instance.instance_a ) ) return suite.failed( 'instance a must be a proxy' );
+            if (  $.isProxy( instance.instance_b ) ) return suite.failed( 'instance b should not be a proxy' );
             suite.passed();
           } );
         },
         */
         'noProxy': function ( suite ) {
-          if ( suite.ccm.helper.isProxy( true      ) ) return suite.failed(      "boolean can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( 1         ) ) return suite.failed(       "number can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( false     ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( null      ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( undefined ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( 0         ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( ''        ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( []        ) ) return suite.failed(        "array can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( {}        ) ) return suite.failed( "empty object can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( { component: {} } ) ) return suite.failed( "object with object in component property can't be a ccm proxy instance." );
-          if ( suite.ccm.helper.isProxy( { component: '' } ) ) return suite.failed( "object with empty string in component property can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( true      ) ) return suite.failed(      "boolean can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( 1         ) ) return suite.failed(       "number can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( false     ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( null      ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( undefined ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( 0         ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( ''        ) ) return suite.failed(  "falsy value can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( []        ) ) return suite.failed(        "array can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( {}        ) ) return suite.failed( "empty object can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( { component: {} } ) ) return suite.failed( "object with object in component property can't be a ccm proxy instance." );
+          if ( suite.$.isProxy( { component: '' } ) ) return suite.failed( "object with empty string in component property can't be a ccm proxy instance." );
           suite.passed();
         }
       }
@@ -1150,35 +1282,35 @@ ccm.files[ 'ccm-tests.js' ] = {
       },
       tests: {
         'correctUpperSubset': function ( suite ) {
-          suite.assertTrue( suite.ccm.helper.isSubset( {
+          suite.assertTrue( suite.$.isSubset( {
             name: 'John Doe',
             counter: 3,
             isValid: true
           }, suite.other ) );
         },
         'correctLowerSubset': function ( suite ) {
-          suite.assertTrue( suite.ccm.helper.isSubset( {
+          suite.assertTrue( suite.$.isSubset( {
             values: [ 'abc', 123, false ],
             settings: { title: 'Welcome!', year: 2017, greedy: true },
             onLoad: suite.other.onLoad
           }, suite.other ) );
         },
         'correctSingleProperties': function ( suite ) {
-          if ( !suite.ccm.helper.isSubset( { name: 'John Doe' }, suite.other ) ) return suite.failed( 'correct string property must be match'  );
-          if ( !suite.ccm.helper.isSubset( { counter: 3       }, suite.other ) ) return suite.failed( 'correct number property must be match'  );
-          if ( !suite.ccm.helper.isSubset( { isValid: true    }, suite.other ) ) return suite.failed( 'correct boolean property must be match' );
-          if ( !suite.ccm.helper.isSubset( { values:   [ 'abc', 123, false ] },                           suite.other ) ) return suite.failed( 'correct array property must be match' );
-          if ( !suite.ccm.helper.isSubset( { settings: { title: 'Welcome!', year: 2017, greedy: true } }, suite.other ) ) return suite.failed( 'correct object property must be match' );
-          if ( !suite.ccm.helper.isSubset( { onLoad:   suite.other.onLoad },                              suite.other ) ) return suite.failed( 'correct function property must be match' );
+          if ( !suite.$.isSubset( { name: 'John Doe' }, suite.other ) ) return suite.failed( 'correct string property must be match'  );
+          if ( !suite.$.isSubset( { counter: 3       }, suite.other ) ) return suite.failed( 'correct number property must be match'  );
+          if ( !suite.$.isSubset( { isValid: true    }, suite.other ) ) return suite.failed( 'correct boolean property must be match' );
+          if ( !suite.$.isSubset( { values:   [ 'abc', 123, false ] },                           suite.other ) ) return suite.failed( 'correct array property must be match' );
+          if ( !suite.$.isSubset( { settings: { title: 'Welcome!', year: 2017, greedy: true } }, suite.other ) ) return suite.failed( 'correct object property must be match' );
+          if ( !suite.$.isSubset( { onLoad:   suite.other.onLoad },                              suite.other ) ) return suite.failed( 'correct function property must be match' );
           suite.passed();
         },
         'incorrectSingleProperties': function ( suite ) {
-          if ( suite.ccm.helper.isSubset( { name: 'Doe, John' }, suite.other ) ) return suite.failed( 'incorrect string property should not match'  );
-          if ( suite.ccm.helper.isSubset( { counter: 2        }, suite.other ) ) return suite.failed( 'incorrect number property should not match'  );
-          if ( suite.ccm.helper.isSubset( { isValid: false    }, suite.other ) ) return suite.failed( 'incorrect boolean property should not match' );
-          if ( suite.ccm.helper.isSubset( { values:   [ 'xyz', 123, false ] },                                suite.other ) ) return suite.failed( 'incorrect array property should not match' );
-          if ( suite.ccm.helper.isSubset( { settings: { title: 'Hello, world.', year: 2017, greedy: true } }, suite.other ) ) return suite.failed( 'incorrect object property should not match' );
-          if ( suite.ccm.helper.isSubset( { onLoad:   function () { console.log( 'Loading..' ); } },          suite.other ) ) return suite.failed( 'incorrect function property should not match' );
+          if ( suite.$.isSubset( { name: 'Doe, John' }, suite.other ) ) return suite.failed( 'incorrect string property should not match'  );
+          if ( suite.$.isSubset( { counter: 2        }, suite.other ) ) return suite.failed( 'incorrect number property should not match'  );
+          if ( suite.$.isSubset( { isValid: false    }, suite.other ) ) return suite.failed( 'incorrect boolean property should not match' );
+          if ( suite.$.isSubset( { values:   [ 'xyz', 123, false ] },                                suite.other ) ) return suite.failed( 'incorrect array property should not match' );
+          if ( suite.$.isSubset( { settings: { title: 'Hello, world.', year: 2017, greedy: true } }, suite.other ) ) return suite.failed( 'incorrect object property should not match' );
+          if ( suite.$.isSubset( { onLoad:   function () { console.log( 'Loading..' ); } },          suite.other ) ) return suite.failed( 'incorrect function property should not match' );
           suite.passed();
         }
       }
@@ -1196,11 +1328,11 @@ ccm.files[ 'ccm-tests.js' ] = {
       },
       tests: {
         'keyframe': function ( suite ) {
-          suite.ccm.helper.loading( suite.dummy );
+          suite.$.loading( suite.dummy );
           suite.assertSame( '@keyframes ccm_loading { to { transform: rotate(360deg); } }', suite.dummy.element.parentNode.querySelector( '#ccm_keyframe' ).innerHTML );
         },
         'icon': function ( suite ) {
-          suite.assertSame( '<div class="ccm_loading"><div style="display: inline-block; width: 0.5em; height: 0.5em; border: 0.15em solid #009ee0; border-right-color: transparent; border-radius: 50%; animation: ccm_loading 1s linear infinite;"></div></div>', suite.ccm.helper.loading( suite.dummy ).outerHTML );
+          suite.assertSame( '<div class="ccm_loading"><div style="display: inline-block; width: 0.5em; height: 0.5em; border: 0.15em solid #009ee0; border-right-color: transparent; border-radius: 50%; animation: ccm_loading 1s linear infinite;"></div></div>', suite.$.loading( suite.dummy ).outerHTML );
         }
       }
     },
@@ -1210,22 +1342,22 @@ ccm.files[ 'ccm-tests.js' ] = {
           suite.assertFalse( typeof arguments.map === 'function' );
         },
         'iterableArguments': function ( suite ) {
-          suite.assertTrue( typeof suite.ccm.helper.makeIterable( arguments ).map === 'function' );
+          suite.assertTrue( typeof suite.$.makeIterable( arguments ).map === 'function' );
         },
         'notIterableElements': function ( suite ) {
-          if ( suite.ccm.helper.isFirefox() )
+          if ( suite.$.isFirefox() )
             suite.assertTrue( typeof document.head.children.map === 'function' );
           else
             suite.assertFalse( typeof document.head.children.map === 'function' );
         },
         'iterableElements': function ( suite ) {
-          suite.assertTrue( typeof suite.ccm.helper.makeIterable( document.head.children ).map === 'function' );
+          suite.assertTrue( typeof suite.$.makeIterable( document.head.children ).map === 'function' );
         },
         'notIterableAttributes': function ( suite ) {
           suite.assertFalse( typeof document.head.attributes.map === 'function' );
         },
         'iterableAttributes': function ( suite ) {
-          suite.assertTrue( typeof suite.ccm.helper.makeIterable( document.head.attributes ).map === 'function' );
+          suite.assertTrue( typeof suite.$.makeIterable( document.head.attributes ).map === 'function' );
         }
       }
     },
@@ -1382,7 +1514,7 @@ ccm.files[ 'ccm-tests.js' ] = {
               var self = this;
               var my;
               this.ready = function ( callback ) {
-                my = suite.ccm.helper.privatize( self, 'childNodes', 'component', 'bar', 'baz', 'id', 'index', 'init', 'ready', 'render' );
+                my = suite.$.privatize( self, 'childNodes', 'component', 'bar', 'baz', 'id', 'index', 'init', 'ready', 'render' );
                 if ( Object.keys( my ).length !== 1 || my.bar !== 'xyz' ) suite.failed( 'wrong privatized properties: ' + JSON.stringify( my ) );
                 callback();
               };
@@ -1401,7 +1533,7 @@ ccm.files[ 'ccm-tests.js' ] = {
               var self = this;
               var my;
               this.ready = function ( callback ) {
-                my = suite.ccm.helper.privatize( self );
+                my = suite.$.privatize( self );
                 callback();
               };
             }
@@ -1414,16 +1546,16 @@ ccm.files[ 'ccm-tests.js' ] = {
     regex: {
       tests: {
         'validFilename': function ( suite ) {
-          suite.assertTrue( suite.ccm.helper.regex( 'filename' ).test( 'ccm.dummy-3.2.1.min.js' ) );
+          suite.assertTrue( suite.$.regex( 'filename' ).test( 'ccm.dummy-3.2.1.min.js' ) );
         },
         'invalidFilename': function ( suite ) {
-          suite.assertFalse( suite.ccm.helper.regex( 'filename' ).test( 'dummy.js' ) );
+          suite.assertFalse( suite.$.regex( 'filename' ).test( 'dummy.js' ) );
         },
         'validKey': function ( suite ) {
-          suite.assertTrue( suite.ccm.helper.regex( 'key' ).test( 'Dummy12_Foo3' ) );
+          suite.assertTrue( suite.$.regex( 'key' ).test( 'Dummy12_Foo3' ) );
         },
         'invalidKey': function ( suite ) {
-          suite.assertFalse( suite.ccm.helper.regex( 'key' ).test( '' ) || suite.ccm.helper.regex( 'key' ).test( '$' ) );
+          suite.assertFalse( suite.$.regex( 'key' ).test( '' ) || suite.$.regex( 'key' ).test( '$' ) );
         }
       }
     },
@@ -1436,19 +1568,19 @@ ccm.files[ 'ccm-tests.js' ] = {
       tests: {
         'callbackResult': function ( suite ) {
           var obj = { dummy: [ 'ccm.load', suite.url ] };
-          suite.ccm.helper.solveDependency( obj, suite.obj_key, function ( result ) {
+          suite.$.solveDependency( obj, suite.obj_key, function ( result ) {
             suite.assertSame( suite.url, result );
           } );
         },
         'noReturnResult': function ( suite ) {
           var obj = { dummy: [ 'ccm.load', suite.url ] };
-          var result = suite.ccm.helper.solveDependency( obj, suite.obj_key );
+          var result = suite.$.solveDependency( obj, suite.obj_key );
           suite.assertFalse( result );
         },
         'cachedReturnResult': function ( suite ) {
           suite.ccm.load( suite.url, function () {
             var obj = { dummy: [ 'ccm.load', suite.url ] };
-            var result = suite.ccm.helper.solveDependency( obj, suite.obj_key );
+            var result = suite.$.solveDependency( obj, suite.obj_key );
             suite.assertSame( suite.url, result );
           } );
         }
@@ -1502,8 +1634,8 @@ ccm.files[ 'ccm-tests.js' ] = {
             plain: {},
             _class: {},
             node: {},
-            many: suite.ccm.helper.isFirefox() ? [ {} ] : { 0: {} }
-          }, suite.ccm.helper.toJSON( {
+            many: suite.$.isFirefox() ? [ {} ] : { 0: {} }
+          }, suite.$.toJSON( {
             x: undefined,
             ref: null,
             error: NaN,
@@ -1527,7 +1659,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       tests: {
         'oneSecond': function ( suite ) {
           var time = new Date().getTime();
-          suite.ccm.helper.wait( 500, function () {
+          suite.$.wait( 500, function () {
             suite.assertSame( 500, Math.floor( ( new Date().getTime() - time ) / 10 ) * 10 );
           } );
         }
