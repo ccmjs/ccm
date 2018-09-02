@@ -991,7 +991,7 @@
       async function defineCustomElement() {
 
         // load polyfill for Custom Elements
-        if ( 'customElements' in window ) await self.load( {
+        if ( !( 'customElements' in window ) ) await self.load( {
           url: 'https://ccmjs.github.io/ccm/polyfills/webcomponents-lite.js',
           attr: {
             integrity: 'sha384-yEuTKRGFLhOAfHNxaZiiI23KhMelYudrPUNSUK6T5u1+deGEEKsQ89cS0sPIHjyj',
