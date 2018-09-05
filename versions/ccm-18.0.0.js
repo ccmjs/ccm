@@ -11,18 +11,23 @@
  * - error handling via Promise catch
  * - websocket callbacks removed after one-time call
  * - bug fix at priority order when merging given instance configurations -> prepareConfig()
- * - ccm instance Light DOM will always be transformed to Element Nodes -> ccm.helper.html( instance.inner )
+ * - each ccm component remembers its originally URL (if possible)
+ * - each ccm instance remembers its originally config instead of originally dependency
+ * - ccm instance Light DOM will always be transformed to Element Nodes -> ccm.helper.html(instance.inner)
  * - HTML attributes of ccm Custom Element are always watched -> triggers instance.update()
  * - each ccm instance has a default instance.update() -> restarts instance with updated value(s)
+ * - key attribute of ccm Custom Element will be deleted after processing
+ * - root element of a ccm instance has no more automatically HTML ID
  * - creating of a ccm proxy instance via ccm.proxy()
  * - if ccm datastore settings given as string (not URL) then IndexedDB is used with given string as datastore name
  * - if ccm datastore settings given as URL then local cache is used and initial data is loaded via URL with ccm.load
- * - updated ccm.helper.dataset (returns Promise and uses of async await)
+ * - updated ccm.helper.dataset (returns Promise and uses async await)
  * - updated ccm.helper.integrate (no manipulation of original parameters)
  * - removed ccm.helper.isDatastoreSettings
  * - added ccm.helper.isFramework(value):boolean
  * - updated ccm.helper.isProxy
  * - added ccm.helper.isSpecialObject(value):boolean
+ * - updated ccm.helper.onFinish (returns Promise and uses async await)
  * - updated ccm.helper.privatize
  * - added ccm.helper.solveDependencies(obj):Promise
  * - updated ccm.helper.solveDependency(arr):Promise
@@ -593,7 +598,13 @@
               let element = { tag: 'link', rel: 'import', href: resource.url, async: true };
               if ( resource.attr ) self.helper.integrate( resource.attr, element );
               element = self.helper.html( element );
-              element.onload = () => successData( element.import );
+              element.onload = () => {
+                const fragment = document.createDocumentFragment();
+                const children = element.import.body.childNodes;
+                for ( let i = children.length - 1; i > -1; i-- )
+                  fragment.prepend( children[ i ] );
+                successData( fragment );
+              };
               element.onerror = event => { self.helper.removeElement( element ); error( element, event ); };
               document.head.appendChild( element );  // HTML Import does not work with Shadow DOM => use always <head>
             }
@@ -930,7 +941,7 @@
           if ( components[ index ] ) return self.helper.clone( components[ index ] );
 
           // has component URL? => load component object
-          if ( self.helper.regex( 'filename' ).test( component.split( '/' ).pop() ) ) return await self.load( component );
+          if ( self.helper.regex( 'filename' ).test( component.split( '/' ).pop() ) ) { const response = await self.load( component ); response.url = component; return response; }
 
           // not registered and no URL? => throw error
           return new Error( 'invalid component index or URL: ' + component );
@@ -1010,6 +1021,7 @@
                 return;
             self.helper.wait( 1, () => {
               const config = self.helper.generateConfig( this );
+              this.removeAttribute( 'key' );
               config.root = this;
               component.start( config );
             } );
@@ -1029,12 +1041,6 @@
      */
     instance: async ( component, config ) => {
 
-      /**
-       * action of this method call
-       * @type {ccm.types.action}
-       */
-      const call = [ self.instance, component, self.helper.clone( config ) ];
-
       // get object of ccm component
       component = await self.component( component );
 
@@ -1046,6 +1052,9 @@
        * @type {ccm.types.instance}
        */
       const instance = createInstance();
+
+      // each instance knows his original config
+      instance.config = JSON.stringify( config );
 
       // solve ccm dependencies contained in config
       config = await self.helper.solveDependencies( config, instance );
@@ -1084,7 +1093,6 @@
         // set ccm specific instance properties
         instance.ccm       = component.ccm;                              // framework reference
         instance.component = component;                                  // set component reference
-        instance.call      = call;                                       // each instance knows the action that created it
         instance.parent    = config.parent; delete config.parent;        // reference of parent ccm instance
         instance.root      = config.root;   delete config.root;          // instance root element
         instance.id        = ++components[ component.index ].instances;  // instance ID
@@ -1111,9 +1119,6 @@
 
           // no given root? => use on-the-fly element
           if ( !instance.root ) instance.root = document.createElement( 'div' );
-
-          // each root element has instance index as HTML ID
-          instance.root.id = instance.index;
 
           /**
            * Shadow DOM of ccm instance
@@ -2599,6 +2604,7 @@
        * @param {string} [instance.onfinish.alert] - show alert message
        * @param {callback} [instance.onfinish.callback] - additional individual finish callback (will be called after the performed minor actions)
        * @param {Object} results - result data
+       * @returns {Promise}
        * @example
        * instance.onfinish = {
        *   confirm: 'Are you sure?',
@@ -2632,7 +2638,7 @@
        *   callback: function ( instance, results ) { console.log( results ); }
        * };
        */
-      onFinish: ( instance, results ) => {
+      onFinish: async ( instance, results ) => {
 
         /**
          * settings for onfinish actions
@@ -2662,81 +2668,60 @@
         const user = self.context.find( instance, 'user' );
 
         // has user instance? => login user (if not already logged in)
-        if ( settings.login && user ) user.login( proceed ); else proceed();
+        await settings.login && user && user.login();
 
-        function proceed() {
+        // log result data (if necessary)
+        if ( settings.log ) console.log( results );
 
-          // log result data (if necessary)
-          if ( settings.log ) console.log( results );
+        // clear website area of the instance (if necessary)
+        if ( settings.clear ) instance.element.innerHTML = '';
 
-          // clear website area of the instance (if necessary)
-          if ( settings.clear ) instance.element.innerHTML = '';
+        // has to store result data in a datastore?
+        if ( self.helper.isObject( settings.store ) && settings.store.settings && self.helper.isObject( results ) ) {
 
-          // has to store result data in a datastore?
-          if ( self.helper.isObject( settings.store ) && settings.store.settings && self.helper.isObject( results ) ) {
+          /**
+           * deep copy of result data
+           * @type {Object}
+           */
+          const dataset = self.helper.clone( results );
 
-            /**
-             * deep copy of result data
-             * @type {Object}
-             */
-            const dataset = self.helper.clone( results );
-
-            // prepare dataset key
-            if ( settings.store.key && !dataset.key ) dataset.key = settings.store.key;
-            if ( settings.store.user && user && user.isLoggedIn() ) dataset.key = [ user.data().user, dataset.key || self.helper.generateKey() ];
-            if ( settings.store.unique ) {
-              if ( !Array.isArray( dataset.key ) ) dataset.key = [ dataset.key ];
-              dataset.key.push( self.helper.generateKey() );
-            }
-
-            // prepare permission settings
-            if ( settings.store.permissions ) dataset._ = settings.store.permissions;
-
-            // set user instance for datastore
-            if ( user ) settings.store.settings.user = user;
-
-            // store result data in datastore
-            self.set( settings.store.settings, dataset, proceed );
-
+          // prepare dataset key
+          if ( settings.store.key && !dataset.key ) dataset.key = settings.store.key;
+          if ( settings.store.user && user && user.isLoggedIn() ) dataset.key = [ user.data().user, dataset.key || self.helper.generateKey() ];
+          if ( settings.store.unique ) {
+            if ( !Array.isArray( dataset.key ) ) dataset.key = [ dataset.key ];
+            dataset.key.push( self.helper.generateKey() );
           }
-          else proceed();
 
-          function proceed() {
+          // prepare permission settings
+          if ( settings.store.permissions ) dataset._ = settings.store.permissions;
 
-            // restart instance (if necessary)
-            if ( settings.restart ) instance.start( proceed ); else proceed();
+          // set user instance for datastore
+          if ( user ) settings.store.settings.user = user;
 
-            function proceed() {
-
-              // render other content (if necessary)
-              if ( settings.render )
-                if ( self.helper.isObject( settings.render ) && settings.render.component ) {
-                  let config = settings.render.config;
-                  if ( !config ) config = {};
-                  self.start( settings.render.component, config, result => {
-                    self.helper.replace( result.root, instance.root );
-                    proceed();
-                  } );
-                  return;
-                }
-                else self.helper.replace( self.helper.html( settings.render ), instance.root );
-              proceed();
-
-              function proceed() {
-
-                // alert message
-                if ( settings.alert ) alert( settings.alert );
-
-                // perform finish callback (if necessary)
-                settings.callback && settings.callback( instance, results );
-
-              }
-
-            }
-
-          }
+          // store result data in datastore
+          await self.set( settings.store.settings, dataset );
 
         }
+
+        // restart instance (if necessary)
+        settings.restart && await instance.start();
+
+        // render other content (if necessary)
+        if ( settings.render )
+          if ( self.helper.isObject( settings.render ) && settings.render.component ) {
+            let config = settings.render.config;
+            if ( !config ) config = {};
+            const result = await self.start( settings.render.component, config );
+            self.helper.replace( result.root, instance.root );
+          }
+          else self.helper.replace( self.helper.html( settings.render ), instance.root );
+
+        // alert message
+        if ( settings.alert ) alert( settings.alert );
+
+        // perform finish callback (if necessary)
+        settings.callback && settings.callback( instance, results );
 
       },
 
@@ -2822,9 +2807,9 @@
         function privatizeProperty( key ) {
           if ( key === true ) return;
           switch ( key ) {
-            case 'call':
             case 'ccm':
             case 'component':
+            case 'config':
             case 'dependency':
             case 'element':
             case 'id':
