@@ -156,7 +156,7 @@
        * prepares the realtime functionality
        * @returns {Promise}
        */
-      function prepareRealtime() { new Promise( resolve => {
+      function prepareRealtime() { return new Promise( resolve => {
 
         // is no ccm realtime datastore? => abort
         if ( !that.url || that.url.indexOf( 'ws' ) !== 0 ) return resolve();
@@ -175,18 +175,18 @@
         that.socket.onmessage = message => {
 
           // parse server message to JSON
-          message = JSON.parse( message.data );
+          const {callback,data} = JSON.parse( message.data );
 
           // own request? => perform callback
-          if ( message.callback ) { callbacks[ message.callback ]( message.data ); delete callbacks[ message.callback ]; }
+          if ( callback ) { callbacks[ callback ]( data ); delete callbacks[ callback ]; }
 
           // notification about changed data from other client? => perform change callback
-          else that.onchange && that.onchange( message.data );
+          else that.onchange && that.onchange( data );
 
         };
 
         // send initial message
-        that.socket.onopen = () => { that.send( message ); resolve(); };
+        that.socket.onopen = () => { that.socket.send( message ); resolve(); };
 
       } ); }
 
