@@ -11,6 +11,7 @@
  * - error handling via Promise catch
  * - websocket callbacks removed after one-time call
  * - bug fix at priority order when merging given instance configurations -> prepareConfig()
+ * - ccm instances that uses ccm v18 or higher can reuse ccm components that using a lower ccm version (backward compatibility)
  * - each ccm component remembers its originally URL (if possible)
  * - each ccm instance remembers its originally config instead of originally dependency
  * - ccm instance Light DOM will always be transformed to Element Nodes -> ccm.helper.html(instance.inner)
@@ -989,9 +990,9 @@
         // config is given as ccm dependency? => solve dependency
         config = await self.helper.solveDependency( config );
 
-        // add functions for creating and starting ccm instances
-        component.instance = async cfg => await component.ccm.instance( component.index, await prepareConfig( cfg, component.config, config ) );
-        component.start    = async cfg => await component.ccm.start   ( component.index, await prepareConfig( cfg, component.config, config ) );
+        // add functions for creating and starting ccm instances (and considers backward compatibility)
+        component.instance = async ( cfg, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( cfg, component.config, config ), callback );
+        component.start    = async ( cfg, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( cfg, component.config, config ), callback );
 
       }
 
