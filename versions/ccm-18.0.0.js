@@ -2792,7 +2792,7 @@
        *   }
        * } );
        */
-      privatize: ( instance, properties ) => {
+      privatize: function ( instance, properties ) {
 
         const keep = properties === true;
         const obj = {};
@@ -2819,7 +2819,7 @@
             case 'root':
               break;
             default:
-  //          if ( self.helper.isInstance( instance[ key ] ) && instance[ key ].parent && instance[ key ].parent.index === instance.index ) return;
+              if ( self.helper.isInstance( instance[ key ] ) && instance[ key ].parent && instance[ key ].parent.index === instance.index ) return;
               if ( typeof instance[ key ] === 'function' ) return;
               if ( instance[ key ] !== undefined ) obj[ key ] = instance[ key ];
               if ( !keep ) delete instance[ key ];
