@@ -3025,7 +3025,6 @@
           case 'load':
             instance && setContext( dependency );
             return await self.load.apply( null, dependency );
-            break;
           case 'component':
           case 'instance':
           case 'proxy':
@@ -3035,9 +3034,9 @@
           case 'set':
           case 'del':
             if ( !dependency[ 1 ] ) dependency[ 1 ] = {};
+            dependency[ 1 ] = await self.helper.solveDependency( dependency[ 1 ], instance );
             if ( instance ) dependency[ 1 ].parent = instance;
             return await self[ operation ].apply( null, dependency );
-            break;
         }
 
         /**
