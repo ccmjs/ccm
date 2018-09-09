@@ -1056,16 +1056,23 @@
 
       // each instance knows his original config
       instance.config = JSON.stringify( config );
+      // root element without DOM contact? => add root in <head> (resolving dependencies requires DOM contact)
+      if ( !document.contains( instance.root ) ) {
+        instance.root.position = document.createElement( 'div' );
+        if ( instance.root.parentNode )
+          instance.root.parentNode.replaceChild( instance.root.position, instance.root );
+        document.head.appendChild( instance.root );
+      }
 
       // solve ccm dependencies contained in config
       config = await self.helper.solveDependencies( config, instance );
 
-      // remove instance root element from <head>
-      if ( document.head.contains( instance.root ) ) { document.head.removeChild( instance.root );
-
-        // append instance root element to original parent
-        if ( instance.root.parent ) { instance.root.parent.appendChild( instance.root ); delete instance.root.parent; }
-
+      // restore original root position
+      if ( document.head.contains( instance.root ) ) {
+        document.head.removeChild( instance.root );
+        if ( instance.root.position.parentNode )
+          instance.root.position.parentNode.replaceChild( instance.root, instance.root.position );
+        delete instance.root.placeholder;
       }
 
       // convert Light DOM to Element Node
@@ -1129,9 +1136,6 @@
 
           // set content element
           shadow.appendChild( instance.element = self.helper.html( { id: 'element' } ) );
-
-          // root element without DOM contact? => add root in <head> (resolving dependencies requires DOM contact)
-          if ( !document.contains( instance.root ) ) { instance.root.parent = instance.root.parentNode; document.head.appendChild( instance.root ); }
 
         }
 
