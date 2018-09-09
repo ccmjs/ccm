@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.0.0)
+ * @version 18.0.0
  * @changes
  * version 18.0.0 (02.09.2018): improved ccm.component, ccm.instance, ccm.start, ccm.store, ccm.get, ccm.set and ccm.del
  * - works with Promises and async await (no more callback, methods return a Promise) -> code refactoring
@@ -102,7 +102,7 @@
          */
         function openDB() {
 
-          return new Promise( resolve => db ? resolve() : indexedDB.open( 'ccm' ).onsuccess = () => ( db = this.result ) && resolve() );
+          return new Promise( resolve => db ? resolve() : indexedDB.open( 'ccm' ).onsuccess = function () { db = this.result; resolve(); } );
 
         }
 
@@ -2381,7 +2381,7 @@
        */
       isElementNode: function ( value ) {
 
-        return value instanceof Element;
+        return value instanceof Element || value instanceof DocumentFragment;
         //return self.helper.isNode( value ) && value.tagName && true;
 
       },
@@ -2829,24 +2829,25 @@
 
       },
 
-      protect: function ( value ) {
+      /**
+       * filters script elements out of given value
+       * @param {*} value
+       * @returns {*}
+       */
+      protect: value => {
 
         if ( typeof value === 'string' ) {
-          var tag = document.createElement( 'div' );
+          const tag = document.createElement( 'div' );
           tag.innerHTML = value;
-          self.helper.makeIterable( tag.getElementsByTagName( 'script' ) ).map( function ( script ) {
-            script.parentNode.removeChild( script );
-          } );
+          [ ...tag.querySelectorAll( 'script' ) ].forEach( self.helper.removeElement );
           return tag.innerHTML;
         }
 
         if ( self.helper.isElementNode( value ) )
-          self.helper.makeIterable( value.getElementsByTagName( 'script' ) ).map( function ( script ) {
-            script.parentNode.removeChild( script );
-          } );
+          [ ...value.querySelectorAll( 'script' ) ].forEach( self.helper.removeElement );
 
-        else if ( typeof value === 'object' && !self.helper.isNode( value ) )
-          for ( var key in value )
+        else if ( typeof value === 'object' && !self.helper.isSpecialObject( value ) )
+          for ( const key in value )
             value[ key ] = self.helper.protect( value[ key ] );
 
         return value;
