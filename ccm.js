@@ -14,6 +14,7 @@
  * - ccm instances that uses ccm v18 or higher can reuse ccm components that using a lower ccm version (backward compatibility)
  * - each ccm component remembers its originally URL (if possible)
  * - each ccm instance remembers its originally config instead of originally dependency
+ * - every ccm dependency behind config property 'ignore' will not be solved
  * - ccm instance Light DOM will always be transformed to Element Nodes -> ccm.helper.html(instance.inner)
  * - HTML attributes of ccm Custom Element are always watched -> triggers instance.update()
  * - each ccm instance has a default instance.update() -> restarts instance with updated value(s)
@@ -2989,7 +2990,7 @@
           if ( self.helper.isSpecialObject( obj ) ) return;
           for ( const key in obj )
             if ( obj.hasOwnProperty( key ) )
-              if ( key !== 'configs' ) {
+              if ( key !== 'ignore' ) {
                 const value = obj[ key ];
                 if ( self.helper.isDependency( value ) && ( !data_only || value[ 0 ] === 'ccm.get' ) ) {
                   counter++;
