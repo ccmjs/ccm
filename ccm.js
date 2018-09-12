@@ -3157,17 +3157,20 @@
   /**
    * prepares a ccm instance configuration
    * @param {Object} [config={}] - instance configuration
-   * @param {Object} [defaults]  - default instance configuration from component object
-   * @param {Object} [component] - default instance configuration passed during component registration
+   * @param {Object} [defaults={}]  - default instance configuration from component object
+   * @param {Object} [component={}] - default instance configuration passed during component registration
    * @returns {Promise}
    */
-  async function prepareConfig( config={}, defaults, component ) {
+  async function prepareConfig( config={}, defaults={}, component={} ) {
 
     // starting point is default instance configuration from component object
     let result = defaults;
 
+    // integrate base configuration (config key property)
+    result = self.helper.integrate( await self.helper.solveDependency( component.key ), result ); delete component.key;
+
     // integrate default instance configuration passed during component registration
-    result = self.helper.integrate( component, defaults );
+    result = self.helper.integrate( component, result );
 
     // integrate base configuration (config key property)
     result = self.helper.integrate( await self.helper.solveDependency( config.key ), result ); delete config.key;
