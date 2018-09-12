@@ -1134,10 +1134,10 @@
            * Shadow DOM of ccm instance
            * @type {ShadowRoot}
            */
-          const shadow = instance.root.attachShadow( { mode: 'open' } );
+          const shadow = instance.root.shadowRoot || instance.root.attachShadow( { mode: 'open' } );
 
           // set content element
-          shadow.appendChild( instance.element = self.helper.html( { id: 'element' } ) );
+          self.helper.setContent( shadow, instance.element = self.helper.html( { id: 'element' } ) );
 
         }
 
