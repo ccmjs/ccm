@@ -3163,6 +3163,10 @@
    */
   async function prepareConfig( config={}, defaults={}, component={} ) {
 
+    // a configuration is given as ccm dependency? => solve it
+    component = await self.helper.solveDependency( component );
+    config    = await self.helper.solveDependency( config    );
+
     // starting point is default instance configuration from component object
     let result = defaults;
 
@@ -3176,7 +3180,7 @@
     result = self.helper.integrate( await self.helper.solveDependency( config.key ), result ); delete config.key;
 
     // integrate instance configuration
-    return self.helper.integrate( await self.helper.solveDependency( config ), result );
+    return self.helper.integrate( config, result );
 
   }
 
