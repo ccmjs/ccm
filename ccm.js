@@ -292,7 +292,7 @@
       function clientDB() {
 
         const request = getStore().put( priodata );
-        request.onsuccess = event => event.target.result.key === priodata.key ? resolve( event.target.result ) : reject( event.target.result );
+        request.onsuccess = event => event.target.result === priodata.key ? resolve( event.target.result ) : reject( event.target.result );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
@@ -329,7 +329,7 @@
       function clientDB() {
 
         const request = getStore().delete( key );
-        request.onsuccess = event => event.target.result.key === key ? resolve( true ) : reject( event.target.result );
+        request.onsuccess = event => event.target.result === key ? resolve( true ) : reject( event.target.result );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
