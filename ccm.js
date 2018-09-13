@@ -200,7 +200,7 @@
      * returns datastore source information
      * @returns {Object}
      */
-    this.source = () => { return { store: that.store, url: that.url, db: that.db } };
+    this.source = () => { return { name: that.store, url: that.url, db: that.db } };
 
     /**
      * requests one or more datasets
@@ -3176,7 +3176,7 @@
     result = self.helper.integrate( await self.helper.solveDependency( config.key ), result ); delete config.key;
 
     // integrate instance configuration
-    return self.helper.integrate( config, result );
+    return self.helper.integrate( await self.helper.solveDependency( config ), result );
 
   }
 

@@ -200,7 +200,7 @@
      * returns datastore source information
      * @returns {Object}
      */
-    this.source = () => { return { store: that.store, url: that.url, db: that.db } };
+    this.source = () => { return { name: that.store, url: that.url, db: that.db } };
 
     /**
      * requests one or more datasets
