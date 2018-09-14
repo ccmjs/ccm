@@ -1594,15 +1594,15 @@
 
       /**
        * delivers a dataset
-       * @param {Object} settings - contains required data to determine dataset
-       * @param {ccm.Datastore} settings.store - datastore that contains dataset
+       * @param {Object} [settings={}] - contains required data to determine dataset
+       * @param {ccm.Datastore} [settings.store] - datastore that contains dataset
        * @param {ccm.types.key} [settings.key] - key of dataset in datastore
        * @param {boolean} [settings.login] - login user if not logged in (only if user exists)
        * @param {boolean} [settings.user] - make a user-specific key out of key (username is implicitly included)
        * @example TODO examples
        * @returns {Promise}
        */
-      dataset: async settings => {
+      dataset: async ( settings={} ) => {
 
         // first parameter is a datastore? => move it to settings
         if ( self.helper.isDatastore( settings ) ) settings = { store: settings };
