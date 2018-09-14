@@ -243,7 +243,7 @@
       function clientDB() {
 
         const request = getStore().get( key_or_query );
-        request.onsuccess = event => event.target.result.key === key_or_query ? self.helper.solveDependencies( event.target.result, undefined, true ).then( resolve ).catch( resolve ) : reject( event.target.result );
+        request.onsuccess = event => event.target.result ? ( event.target.result.key === key_or_query ? self.helper.solveDependencies( event.target.result, undefined, true ).then( resolve ).catch( resolve ) : reject( event.target.result ) ) : resolve( null );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
