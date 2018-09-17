@@ -1084,7 +1084,7 @@
       self.helper.integrate( config, instance );
 
       // initialize created and dependent instances
-      ( !instance.parent || instance.parent.init === true ) && await initialize();
+      if ( !instance.parent || !instance.parent.init ) await initialize();
 
       return instance;
 
@@ -1108,6 +1108,7 @@
         instance.id        = ++components[ component.index ].instances;  // instance ID
         instance.index     = component.index + '-' + instance.id;        // instance index (unique in hole website)
         setElement();                                                    // set root and content element
+        if ( !instance.init ) instance.init = async () => {};            // each instance must have a init method
 
         // state of an instance can be influenced by HTML attributes of instance root element
         if ( instance.root.id === instance.index ) watchAttributes();
@@ -1278,7 +1279,7 @@
             const next = instances[ i++ ];
 
             // call and delete init method and continue with next founded ccm instance (recursive call)
-            if ( next.init ) return next.init().then( () => { next.init = true; init(); } ); next.init = true; init();
+            next.init().then( () => { delete next.init; init(); } );
 
           }
 
@@ -2821,7 +2822,6 @@
             case 'element':
             case 'id':
             case 'index':
-            case 'init':
             case 'onfinish':
             case 'parent':
             case 'root':
