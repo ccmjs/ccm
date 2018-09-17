@@ -1246,7 +1246,7 @@
                 const value = obj[ key ];
 
                 // value is a ccm instance? (but not parent or proxy instance) => add to founded instances
-                if ( self.helper.isInstance( value ) && key !== 'parent' && !self.helper.isProxy( value) ) instances.push( value );
+                if ( self.helper.isInstance( value ) && key !== 'parent' && !self.helper.isProxy( value) ) { instances.push( value ); relevant.push( value ); }
 
                 // value is an object/array?
                 else if ( Array.isArray( value ) || self.helper.isObject( value ) ) {
