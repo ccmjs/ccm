@@ -2821,6 +2821,7 @@
             case 'element':
             case 'id':
             case 'index':
+            case 'init':
             case 'onfinish':
             case 'parent':
             case 'root':
