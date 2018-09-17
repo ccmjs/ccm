@@ -1084,7 +1084,7 @@
       self.helper.integrate( config, instance );
 
       // initialize created and dependent instances
-      !instance.parent && await initialize();
+      ( !instance.parent || instance.parent.init === true ) && await initialize();
 
       return instance;
 
@@ -1278,7 +1278,7 @@
             const next = instances[ i++ ];
 
             // call and delete init method and continue with next founded ccm instance (recursive call)
-            next.init ? next.init().then( () => { delete next.init; init(); } ) : init();
+            if ( next.init ) return next.init().then( () => { next.init = true; init(); } ); next.init = true; init();
 
           }
 
