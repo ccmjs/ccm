@@ -1084,7 +1084,7 @@
       self.helper.integrate( config, instance );
 
       // initialize created and dependent instances
-      await initialize();
+      !instance.parent && await initialize();
 
       return instance;
 
