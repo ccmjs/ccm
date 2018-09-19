@@ -19,7 +19,6 @@
  * - HTML attributes of ccm Custom Element are always watched -> triggers instance.update()
  * - each ccm instance has a default instance.update() -> restarts instance with updated value(s)
  * - key attribute of ccm Custom Element will be deleted after processing
- * - root element of a ccm instance has no more automatically HTML ID
  * - creating of a ccm proxy instance via ccm.proxy()
  * - if ccm datastore settings given as string (not URL) then IndexedDB is used with given string as datastore name
  * - if ccm datastore settings given as URL then local cache is used and initial data is loaded via URL with ccm.load
@@ -901,34 +900,23 @@
       // set component index
       component.index = component.name + ( component.version ? '-' + component.version.join( '-' ) : '' );
 
-      // component already registered? => use already registered component object
-      if ( components[ component.index ] ) component = self.helper.clone( components[ component.index ] );
+      // component not registered? => register
+      if ( !components[ component.index ] ) await register();
+
+      // is registered => use already registered component object (security reasons)
+      else component = components[ component.index ];
+
+      // no manipulation of original registered component object (security reasons)
+      component = self.helper.clone( component );
 
       // set default instance configuration
       component.config = await prepareConfig( config, component.config );
 
-      // component already registered? => finished
-      if ( components[ component.index ] ) return component;
+      // add functions for creating and starting ccm instances (and considers backward compatibility)
+      component.instance = async ( config, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
+      component.start    = async ( config, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
 
-      // register component
-      components[ component.index ] = component;
-
-      // create global namespace for component
-      ccm.components[ component.index ] = {};
-
-      // load needed ccm framework version
-      const version = await loadFrameworkVersion();
-
-      // setup component
-      await setup();
-
-      // define HTML tag for component
-      await defineCustomElement();
-
-      // initialize component
-      if ( component.init ) await component.init(); delete component.init;
-
-      return self.helper.clone( component );
+      return component;
 
       /**
        * gets component object
@@ -962,79 +950,87 @@
       }
 
       /**
-       * loads needed component used ccm framework version
+       * registers component
        * @returns {Promise}
        */
-      async function loadFrameworkVersion() {
+      async function register() {
 
-        /**
-         * component used ccm framework URL
-         * @type {string}
-         */
-        const url = typeof component.ccm === 'string' ? component.ccm : component.ccm.url;
+        // register component
+        components[ component.index ] = component;
 
-        /**
-         * version number of component used ccm framework
-         * @type {string[]}
-         */
-        const version = ( url.match( /(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/ ) || [ 'latest' ] )[ 0 ];
+        // create global namespace for component
+        ccm.components[ component.index ] = {};
 
-        // load needed ccm framework version if not already there
-        if ( !ccm[ version ] ) await self.load( component.ccm );
-
-        return version;
-      }
-
-      /**
-       * setup component object
-       * @returns {Promise}
-       */
-      async function setup() {
+        // load needed ccm framework version
+        const version = await loadFrameworkVersion();
 
         component.instances = 0;         // add ccm instance counter
         component.ccm = ccm[ version ];  // add ccm framework reference
 
-        // config is given as ccm dependency? => solve dependency
-        config = await self.helper.solveDependency( config );
+        // define HTML tag for component
+        await defineCustomElement();
 
-        // add functions for creating and starting ccm instances (and considers backward compatibility)
-        component.instance = async ( config, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
-        component.start    = async ( config, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
+        // initialize component
+        if ( component.init ) await component.init(); delete component.init;
 
-      }
+        /**
+         * loads needed component used ccm framework version
+         * @returns {Promise}
+         */
+        async function loadFrameworkVersion() {
 
-      /**
-       * defines Custom Element for component
-       * @returns {Promise}
-       */
-      async function defineCustomElement() {
+          /**
+           * component used ccm framework URL
+           * @type {string}
+           */
+          const url = typeof component.ccm === 'string' ? component.ccm : component.ccm.url;
 
-        // load polyfill for Custom Elements
-        if ( !( 'customElements' in window ) ) await self.load( {
-          url: 'https://ccmjs.github.io/ccm/polyfills/webcomponents-lite.js',
-          attr: {
-            integrity: 'sha384-yEuTKRGFLhOAfHNxaZiiI23KhMelYudrPUNSUK6T5u1+deGEEKsQ89cS0sPIHjyj',
-            crossorigin: 'anonymous'
-          }
-        } );
+          /**
+           * version number of component used ccm framework
+           * @type {string[]}
+           */
+          const version = ( url.match( /(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/ ) || [ 'latest' ] )[ 0 ];
 
-        const name = 'ccm-' + component.index;
-        if ( customElements.get( name ) ) return;
-        window.customElements.define( name, class extends HTMLElement {
-          connectedCallback() {
-            if ( !document.body.contains( this ) ) return;
-            let node = this;
-            while ( node = node.parentNode )
-              if ( node.tagName && node.tagName.indexOf( 'CCM-' ) === 0 )
-                return;
-            self.helper.wait( 1, () => {
-              const config = self.helper.generateConfig( this );
-              this.removeAttribute( 'key' );
-              config.root = this;
-              component.start( config );
-            } );
-          }
-        } );
+          // load needed ccm framework version if not already there
+          if ( !ccm[ version ] ) await self.load( component.ccm );
+
+          return version;
+        }
+
+        /**
+         * defines Custom Element for component
+         * @returns {Promise}
+         */
+        async function defineCustomElement() {
+
+          // load polyfill for Custom Elements
+          if ( !( 'customElements' in window ) ) await self.load( {
+            url: 'https://ccmjs.github.io/ccm/polyfills/webcomponents-lite.js',
+            attr: {
+              integrity: 'sha384-yEuTKRGFLhOAfHNxaZiiI23KhMelYudrPUNSUK6T5u1+deGEEKsQ89cS0sPIHjyj',
+              crossorigin: 'anonymous'
+            }
+          } );
+
+          const name = 'ccm-' + component.index;
+          if ( customElements.get( name ) ) return;
+          window.customElements.define( name, class extends HTMLElement {
+            connectedCallback() {
+              if ( !document.body.contains( this ) ) return;
+              let node = this;
+              while ( node = node.parentNode )
+                if ( node.tagName && node.tagName.indexOf( 'CCM-' ) === 0 )
+                  return;
+              self.helper.wait( 1, () => {
+                const config = self.helper.generateConfig( this );
+                this.removeAttribute( 'key' );
+                config.root = this;
+                component.start( config );
+              } );
+            }
+          } );
+
+        }
 
       }
 
@@ -1059,7 +1055,7 @@
        * created and prepared ccm instance
        * @type {ccm.types.instance}
        */
-      const instance = createInstance();
+      let instance = createInstance();
 
       // each instance knows his original config
       instance.config = JSON.stringify( config );
@@ -1087,7 +1083,7 @@
       config.inner = self.helper.html( config.inner );
 
       // integrate config in created ccm instance
-      self.helper.integrate( config, instance );
+      Object.assign( instance, config );
 
       // initialize created and dependent instances
       if ( !instance.parent || !instance.parent.init ) await initialize();
@@ -1136,6 +1132,9 @@
 
           // no given root? => use on-the-fly element
           if ( !instance.root ) instance.root = document.createElement( 'div' );
+
+          // set HTML ID of root element
+          instance.root.id = instance.index;
 
           /**
            * Shadow DOM of ccm instance
@@ -1370,7 +1369,7 @@
         let store = new Datastore();
 
         // integrate datastore configuration
-        store = self.helper.integrate( config, store );
+        Object.assign( store, config );
 
         // initialize ccm datastore and perform callback with created ccm datastore
         store.init().then( () => resolve( store ) );
@@ -1535,11 +1534,11 @@
        */
       clone: function ( value ) {
 
-        return recursive( value );
+        return recursive( value, true );
 
-        function recursive( value ) {
+        function recursive( value, first ) {
 
-          if ( self.helper.isSpecialObject( value ) ) return value;
+          if ( self.helper.isSpecialObject( value ) && !first ) return value;
 
           if ( Array.isArray( value ) || self.helper.isObject( value ) ) {
             var copy = Array.isArray( value ) ? [] : {};
@@ -3159,7 +3158,7 @@
   if ( self.version && !ccm[ self.version() ] ) ccm[ self.version() ] = self;
 
   // update namespace for latest framework version
-  if ( !ccm.version || self.helper.compareVersions( self.version(), ccm.version() ) > 0 ) { ccm.latest = self; ccm = self.helper.integrate( self, ccm ); }
+  if ( !ccm.version || self.helper.compareVersions( self.version(), ccm.version() ) > 0 ) { ccm.latest = self; Object.assign( ccm, self ); }
 
   /**
    * prepares a ccm instance configuration
