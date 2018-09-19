@@ -13,6 +13,7 @@
  * - bug fix at priority order when merging given instance configurations -> prepareConfig()
  * - ccm instances that uses ccm v18 or higher can reuse ccm components that using a lower ccm version (backward compatibility)
  * - each ccm component remembers its originally URL (if possible)
+ * - framework version specific global component namespaces
  * - each ccm instance remembers its originally config instead of originally dependency
  * - every ccm dependency behind config property 'ignore' will not be solved
  * - ccm instance Light DOM will always be transformed to Element Nodes -> ccm.helper.html(instance.inner)
@@ -407,13 +408,6 @@
   if ( !window.ccm ) ccm = {
 
     /**
-     * @summary global namespaces for the registered ccm components
-     * @memberOf ccm
-     * @type {Object.<ccm.types.index,object>}
-     */
-    components: {},
-
-    /**
      * @summary JSONP callbacks for cross domain data exchanges via ccm.load (is always emptied directly)
      * @memberOf ccm
      * @type {Object.<string,function>}
@@ -441,6 +435,13 @@
      * @returns {ccm.types.version}
      */
     version: () => '18.0.0',
+
+    /**
+     * @summary global namespaces for registered ccm components
+     * @memberOf ccm
+     * @type {Object.<ccm.types.index,object>}
+     */
+    components: {},
 
     /**
      * @summary loading of resources
@@ -900,69 +901,23 @@
       // set component index
       component.index = component.name + ( component.version ? '-' + component.version.join( '-' ) : '' );
 
-      // component not registered? => register
-      if ( !components[ component.index ] ) await register();
+      // component not registered? => register component
+      if ( !components[ component.index ] ) {
 
-      // is registered => use already registered component object (security reasons)
-      else component = components[ component.index ];
+        // load needed ccm framework version
+        const version = await loadFrameworkVersion();
 
-      // no manipulation of original registered component object (security reasons)
-      component = self.helper.clone( component );
-
-      // set default instance configuration
-      component.config = await prepareConfig( config, component.config );
-
-      // add functions for creating and starting ccm instances (and considers backward compatibility)
-      component.instance = async ( config, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
-      component.start    = async ( config, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
-
-      return component;
-
-      /**
-       * gets component object
-       * @returns {Promise}
-       */
-      async function getComponentObject() {
-
-        // component is given as string? (component index or URL)
-        if ( typeof component === 'string' ) {
-
-          /**
-           * component index
-           * @type {ccm.types.index}
-           */
-          const index = self.helper.getIndex( component );
-
-          // already registered component? => use already registered component object
-          if ( components[ index ] ) return self.helper.clone( components[ index ] );
-
-          // has component URL? => load component object
-          if ( self.helper.regex( 'filename' ).test( component.split( '/' ).pop() ) ) { const response = await self.load( component ); response.url = component; return response; }
-
-          // not registered and no URL? => throw error
-          return new Error( 'invalid component index or URL: ' + component );
-
-        }
-
-        // component is directly given as object
-        return component;
-
-      }
-
-      /**
-       * registers component
-       * @returns {Promise}
-       */
-      async function register() {
+        // component uses other framework version? => register component via other framework version (and considers backward compatibility)
+        if ( version !== self.version() ) return new Promise( resolve => {
+          const result = ccm[ version ].component( component[ component.url ? 'url' : 'index' ], config, resolve );
+          result && resolve( result );
+        } );
 
         // register component
         components[ component.index ] = component;
 
-        // create global namespace for component
-        ccm.components[ component.index ] = {};
-
-        // load needed ccm framework version
-        const version = await loadFrameworkVersion();
+        // create global component namespaces
+        self.components[ component.index ] = {};
 
         component.instances = 0;         // add ccm instance counter
         component.ccm = ccm[ version ];  // add ccm framework reference
@@ -971,7 +926,7 @@
         await defineCustomElement();
 
         // initialize component
-        if ( component.init ) await component.init(); delete component.init;
+        if ( component.ready ) await component.ready(); delete component.ready;
 
         /**
          * loads needed component used ccm framework version
@@ -994,7 +949,7 @@
           // load needed ccm framework version if not already there
           if ( !ccm[ version ] ) await self.load( component.ccm );
 
-          return version;
+          return ccm[ version ].version();
         }
 
         /**
@@ -1031,6 +986,52 @@
           } );
 
         }
+
+      }
+
+      // is registered => use already registered component object (security reasons)
+      else component = components[ component.index ];
+
+      // no manipulation of original registered component object (security reasons)
+      component = self.helper.clone( component );
+
+      // set default instance configuration
+      component.config = await prepareConfig( config, component.config );
+
+      // add functions for creating and starting ccm instances (and considers backward compatibility)
+      component.instance = async config => await self.instance( component, await prepareConfig( config, component.config ) );
+      component.start    = async config => await self.start   ( component, await prepareConfig( config, component.config ) );
+
+      return component;
+
+      /**
+       * gets component object
+       * @returns {Promise}
+       */
+      async function getComponentObject() {
+
+        // component is given as string? (component index or URL)
+        if ( typeof component === 'string' ) {
+
+          /**
+           * component index
+           * @type {ccm.types.index}
+           */
+          const index = self.helper.getIndex( component );
+
+          // already registered component? => use already registered component object
+          if ( components[ index ] ) return self.helper.clone( components[ index ] );
+
+          // has component URL? => load component object
+          if ( self.helper.regex( 'filename' ).test( component.split( '/' ).pop() ) ) { const response = await self.load( component ); response.url = component; return response; }
+
+          // not registered and no URL? => throw error
+          return new Error( 'invalid component index or URL: ' + component );
+
+        }
+
+        // component is directly given as object
+        return component;
 
       }
 
@@ -3158,7 +3159,7 @@
   if ( self.version && !ccm[ self.version() ] ) ccm[ self.version() ] = self;
 
   // update namespace for latest framework version
-  if ( !ccm.version || self.helper.compareVersions( self.version(), ccm.version() ) > 0 ) { ccm.latest = self; Object.assign( ccm, self ); }
+  if ( !ccm.version || self.helper.compareVersions( self.version(), ccm.version() ) > 0 ) { ccm.latest = self; Object.assign( ccm, self.helper.clone( self ) ); }
 
   /**
    * prepares a ccm instance configuration
@@ -3207,7 +3208,7 @@
    * @property {ccm.types.version} version - <i>ccm</i> component version number
    * @property {ccm.types.config} config - default configuration for own <i>ccm</i> instances
    * @property {function} Instance - constructor for creating <i>ccm</i> instances out of this component
-   * @property {function} init - callback when this component is registered
+   * @property {function} ready - callback when this component is registered (deleted after one-time call)
    * @property {function} instance - creates an <i>ccm</i> instance out of this component
    * @property {function} start - creates and starts an <i>ccm</i> instance
    * @property {number} instances - number of own created <i>ccm</i> instances
