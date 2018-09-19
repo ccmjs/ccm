@@ -902,7 +902,13 @@
       component.index = component.name + ( component.version ? '-' + component.version.join( '-' ) : '' );
 
       // component already registered? => use already registered component object
-      if ( components[ component.index ] ) return self.helper.clone( components[ component.index ] );
+      if ( components[ component.index ] ) component = self.helper.clone( components[ component.index ] );
+
+      // set default instance configuration
+      component.config = await prepareConfig( config, component.config );
+
+      // component already registered? => finished
+      if ( components[ component.index ] ) return component;
 
       // register component
       components[ component.index ] = component;
@@ -992,8 +998,8 @@
         config = await self.helper.solveDependency( config );
 
         // add functions for creating and starting ccm instances (and considers backward compatibility)
-        component.instance = async ( cfg, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( cfg, component.config, config ), callback );
-        component.start    = async ( cfg, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( cfg, component.config, config ), callback );
+        component.instance = async ( config, callback ) => await component.ccm.instance( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
+        component.start    = async ( config, callback ) => await component.ccm.start   ( component[ self !== component.ccm && component.url ? 'url' : 'index' ], await prepareConfig( config, component.config ), callback );
 
       }
 
@@ -3159,30 +3165,23 @@
    * prepares a ccm instance configuration
    * @param {Object} [config={}] - instance configuration
    * @param {Object} [defaults={}]  - default instance configuration from component object
-   * @param {Object} [component={}] - default instance configuration passed during component registration
    * @returns {Promise}
    */
-  async function prepareConfig( config={}, defaults={}, component={} ) {
+  async function prepareConfig( config={}, defaults={} ) {
 
-    // a configuration is given as ccm dependency? => solve it
-    component = await self.helper.solveDependency( component );
-    config    = await self.helper.solveDependency( config    );
+    // config is given as ccm dependency? => solve it
+    config = await self.helper.solveDependency( config );
 
     // starting point is default instance configuration from component object
     let result = defaults;
 
     // integrate base configuration (config key property)
-    result = self.helper.integrate( await self.helper.solveDependency( component.key ), result ); delete component.key;
-
-    // integrate default instance configuration passed during component registration
-    result = self.helper.integrate( component, result );
-
-    // integrate base configuration (config key property)
     result = self.helper.integrate( await self.helper.solveDependency( config.key ), result ); delete config.key;
 
     // integrate instance configuration
-    return self.helper.integrate( config, result );
+    result = self.helper.integrate( config, result );
 
+    return result;
   }
 
   /*
