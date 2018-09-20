@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.0.0)
+ * @version 18.0.0
  * @changes
  * version 18.0.0 (02.09.2018): improved ccm.component, ccm.instance, ccm.start, ccm.store, ccm.get, ccm.set and ccm.del
  * - works with Promises and async await (no more callback, methods return a Promise) -> code refactoring
@@ -1131,17 +1131,20 @@
           // root is keyword 'name'? => use inner website area of the parent where HTML ID is equal to component name
           if ( instance.root === 'name' && instance.parent ) instance.root = instance.parent.element.querySelector( '#' + component.name );
 
-          // no given root? => use on-the-fly element
-          if ( !instance.root ) instance.root = document.createElement( 'div' );
+          /**
+           * root element of ccm instance
+           * @type {Element}
+           */
+          const root = self.helper.html( { id: instance.index } );
 
-          // set HTML ID of root element
-          instance.root.id = instance.index;
+          // set root element
+          if ( instance.root ) self.helper.setContent( instance.root, root ); instance.root = root;
 
           /**
            * Shadow DOM of ccm instance
            * @type {ShadowRoot}
            */
-          const shadow = instance.root.shadowRoot || instance.root.attachShadow( { mode: 'open' } );
+          const shadow = root.shadowRoot || root.attachShadow( { mode: 'open' } );
 
           // set content element
           self.helper.setContent( shadow, instance.element = self.helper.html( { id: 'element' } ) );
