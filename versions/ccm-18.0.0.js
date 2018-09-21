@@ -2574,7 +2574,7 @@
           instance.element.parentNode.appendChild( style );
         }
 
-        return self.helper.html( { class: 'ccm_loading', inner: { style: 'display: inline-block; width: 0.5em; height: 0.5em; border: 0.15em solid #009ee0; border-right-color: transparent; border-radius: 50%; animation: ccm_loading 1s linear infinite;' } } );
+        return self.helper.html( { class: 'ccm_loading', style: 'display: grid;', inner: { style: 'align-self: center; justify-self: center; display: inline-block; width: 2em; height: 2em; border: 0.3em solid #f3f3f3; border-top-color: #009ee0; border-left-color: #009ee0; border-radius: 50%; animation: ccm_loading 1.5s linear infinite;' } } );
       },
 
       /**
