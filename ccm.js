@@ -1324,7 +1324,7 @@
      * @returns {Promise}
      */
     proxy: async ( component, config ) => {
-      const obj = { component: { Instance: true } };
+      const obj = { ccm: true, component: { Instance: true } };
       obj.start = async () => {
         await Object.assign( await self.instance( component, config ), obj ).start();
       };
@@ -2426,7 +2426,7 @@
        * @param {*} value - value to check
        * @returns {boolean}
        */
-      isInstance: value => self.helper.isObject( value ) && self.helper.isComponent( value.component ) && true,
+      isInstance: value => self.helper.isObject( value ) && self.helper.isComponent( value.component ) && value.ccm && true,
 
       /**
        * checks if a value is a valid ccm dataset key
