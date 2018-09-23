@@ -23,7 +23,7 @@
  * - creating of a ccm proxy instance via ccm.proxy()
  * - if ccm datastore settings given as string (not URL) then IndexedDB is used with given string as datastore name
  * - if ccm datastore settings given as URL then local cache is used and initial data is loaded via URL with ccm.load
- * - updated ccm.helper.dataset (returns Promise and uses async await)
+ * - updated ccm.helper.dataset (returns Promise and uses async await and added shortcut to store dataset in its original datastore and changed order of array key elements)
  * - updated ccm.helper.integrate (no manipulation of original parameters)
  * - removed ccm.helper.isDatastoreSettings
  * - added ccm.helper.isFramework(value):boolean
@@ -2609,7 +2609,7 @@
        * @param {boolean} [instance.onfinish.login] - user will be logged in if not already logged in (only works if the instance has a public property "user" with a <i>ccm</i> user instance as the value)
        * @param {boolean} [instance.onfinish.log] - log result data in browser console
        * @param {Object} [instance.onfinish.clear] - clear website area of the finished <i>ccm</i> instance
-       * @param {Object} [instance.onfinish.store] - use this to store the result data in a data store
+       * @param {Object|boolean} [instance.onfinish.store] - use this to store the result data in a data store
        * @param {ccm.types.settings} instance.onfinish.store.settings - settings for a <i>ccm</i> datastore (result data will be set in this datastore)
        * @param {ccm.types.key} [instance.onfinish.store.key] - dataset key for result data (default is generated key)
        * @param {boolean} [instance.onfinish.store.user] - if set, the key is extended by the user ID of the logged-in user (only works if the instance has a public property "user" with a <i>ccm</i> user instance as the value and the user is logged in)
@@ -2685,16 +2685,16 @@
         const user = self.context.find( instance, 'user' );
 
         // has user instance? => login user (if not already logged in)
-        await settings.login && user && user.login();
+        settings.login && user && await user.login();
 
         // log result data (if necessary)
-        if ( settings.log ) console.log( results );
+        settings.log && console.log( results );
 
         // clear website area of the instance (if necessary)
         if ( settings.clear ) instance.element.innerHTML = '';
 
         // has to store result data in a datastore?
-        if ( self.helper.isObject( settings.store ) && settings.store.settings && self.helper.isObject( results ) ) {
+        if ( settings.store ) {
 
           /**
            * deep copy of result data
@@ -2702,24 +2702,34 @@
            */
           const dataset = self.helper.clone( results );
 
+          // allow shortcut for update dataset in its original datastore
+          if ( settings.store === true ) settings.store = {};
+
           // prepare dataset key
-          if ( settings.store.key && !dataset.key ) dataset.key = settings.store.key;
-          if ( settings.store.user && user && user.isLoggedIn() ) dataset.key = [ user.data().user, dataset.key || self.helper.generateKey() ];
-          if ( settings.store.unique ) {
-            if ( !Array.isArray( dataset.key ) ) dataset.key = [ dataset.key ];
-            dataset.key.push( self.helper.generateKey() );
-          }
+          if ( settings.store.key ) dataset.key = settings.store.key;
+          if ( !Array.isArray( dataset.key ) ) dataset.key = [ dataset.key || self.helper.generateKey() ];
+          settings.store.user && user && user.isLoggedIn() && dataset.key.push( user.data().user );
+          settings.store.unique && dataset.key.push( self.helper.generateKey() );
 
           // prepare permission settings
           if ( settings.store.permissions ) dataset._ = settings.store.permissions;
 
-          // set user instance for datastore
-          if ( user ) settings.store.settings.user = user;
+          // has store settings?
+          if ( settings.store.settings ) {
 
-          // store result data in datastore
-          await self.set( settings.store.settings, dataset );
+            // set user instance for datastore
+            if ( user ) settings.store.settings.user = user;
+
+            // store result data in datastore
+            await self.set( settings.store.settings, dataset );
+          }
+          // update dataset in its original datastore
+          else await instance.data.store.set( dataset );
 
         }
+
+        // alert message
+        if ( settings.alert ) alert( settings.alert );
 
         // restart instance (if necessary)
         settings.restart && await instance.start();
@@ -2733,9 +2743,6 @@
             self.helper.replace( result.root, instance.root );
           }
           else self.helper.replace( self.helper.html( settings.render ), instance.root );
-
-        // alert message
-        if ( settings.alert ) alert( settings.alert );
 
         // perform finish callback (if necessary)
         settings.callback && settings.callback( instance, results );
