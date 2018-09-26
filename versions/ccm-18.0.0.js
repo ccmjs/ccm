@@ -1629,6 +1629,9 @@
         // no dataset key? => generate a unique key
         if ( !settings.key ) settings.key = self.helper.generateKey();
 
+        // key is initial data? => take it as result
+        if ( self.helper.isObject( settings.key ) ) return settings.key;
+
         /**
          * nearest user instance in ccm context tree
          * @type {ccm.types.instance}
