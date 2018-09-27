@@ -2316,10 +2316,10 @@
         dataset = self.helper.clone( dataset );
 
         // no given priority data? => return given dataset
-        if ( !priodata ) return dataset;
+        if ( !self.helper.isObject( priodata ) ) return dataset;
 
         // no given dataset? => return given priority data
-        if ( !dataset ) return self.helper.clone( priodata );
+        if ( !self.helper.isObject( dataset ) ) return self.helper.clone( priodata );
 
         // iterate over priority data properties
         for ( const key in priodata ) {
