@@ -309,6 +309,7 @@
     /**
      * deletes a dataset
      * @param {ccm.types.key} key - dataset key
+     * @returns {Promise}
      */
     this.del = key => new Promise( ( resolve, reject ) => {
 
@@ -329,7 +330,7 @@
       function clientDB() {
 
         const request = getStore().delete( key );
-        request.onsuccess = event => event.target.result === key ? resolve( true ) : reject( event.target.result );
+        request.onsuccess = event => event.target.result === undefined ? resolve( true ) : reject( event.target.result );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
