@@ -1115,7 +1115,7 @@
         if ( !instance.init ) instance.init = async () => {};            // each instance must have a init method
 
         // state of an instance can be influenced by HTML attributes of instance root element
-        if ( instance.root.id === instance.index && instance.root.parentNode.tagName.indexOf( 'CCM-' ) === 0 ) watchAttributes();
+        if ( instance.root.id === instance.index && instance.root.parentNode && instance.root.parentNode.tagName.indexOf( 'CCM-' ) === 0 ) watchAttributes();
 
         return instance;
 
