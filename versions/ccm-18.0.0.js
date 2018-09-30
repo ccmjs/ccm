@@ -4,7 +4,7 @@
  * @license The MIT License (MIT)
  * @version 18.0.0
  * @changes
- * version 18.0.0 (02.09.2018): improved ccm.component, ccm.instance, ccm.start, ccm.store, ccm.get, ccm.set and ccm.del
+ * version 18.0.0 (30.09.2018): improved ccm.component, ccm.instance, ccm.start, ccm.store, ccm.get, ccm.set and ccm.del
  * - works with Promises and async await (no more callback, methods return a Promise) -> code refactoring
  * - no privatization for ccm datastore members
  * - renamed 'datasets' property to 'dataset' in realtime ccm datastore settings
@@ -1115,7 +1115,7 @@
         if ( !instance.init ) instance.init = async () => {};            // each instance must have a init method
 
         // state of an instance can be influenced by HTML attributes of instance root element
-        if ( instance.root.id === instance.index ) watchAttributes();
+        if ( instance.root.id === instance.index && instance.root.parentNode.tagName.indexOf( 'CCM-' ) === 0 ) watchAttributes();
 
         return instance;
 
@@ -1160,14 +1160,15 @@
             switch ( key ) {
               case 'ccm':
               case 'component':
-              case 'dependency':
-              case 'parent':
+              case 'config':
+              case 'element':
               case 'id':
               case 'index':
-              case 'element':
-              case 'root':
               case 'init':
+              case 'onfinish':
+              case 'parent':
               case 'ready':
+              case 'root':
               case 'start':
               case 'update':
                 break;
@@ -1212,7 +1213,7 @@
               instance.update( key, value );
             } )
           );
-          observer.observe( instance.root, { attributes: true } );
+          observer.observe( instance.root.parentNode, { attributes: true } );
 
         }
 
@@ -2571,11 +2572,12 @@
       loading: function ( instance ) {
 
         // set keyframe for ccm loading icon animation
-        if ( !instance.element.parentNode.querySelector( '#ccm_keyframe' ) ) {
-          var style = document.createElement( 'style' );
+        const element = instance ? instance.element.parentNode : document.head;
+        if ( !element.querySelector( '#ccm_keyframe' ) ) {
+          const style = document.createElement( 'style' );
           style.id = 'ccm_keyframe';
           style.appendChild( document.createTextNode( '@keyframes ccm_loading { to { transform: rotate(360deg); } }' ) );
-          instance.element.parentNode.appendChild( style );
+          element.appendChild( style );
         }
 
         return self.helper.html( { class: 'ccm_loading', style: 'display: grid;', inner: { style: 'align-self: center; justify-self: center; display: inline-block; width: 2em; height: 2em; border: 0.3em solid #f3f3f3; border-top-color: #009ee0; border-left-color: #009ee0; border-radius: 50%; animation: ccm_loading 1.5s linear infinite;' } } );
