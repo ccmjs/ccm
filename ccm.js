@@ -1253,7 +1253,7 @@
 
             // search object/array
             for ( const key in obj )
-              if ( obj.hasOwnProperty( key ) ) {
+              if ( obj.hasOwnProperty && obj.hasOwnProperty( key ) ) {
                 const value = obj[ key ];
 
                 // value is a ccm instance? (but not parent or proxy instance) => add to founded instances
