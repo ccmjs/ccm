@@ -1054,7 +1054,7 @@
 
       // component uses other framework version? => create instance via other framework version (and considers backward compatibility)
       if ( component.ccm.version() !== self.version() ) return new Promise( async resolve => {
-        const result = await ccm[ version ].instance( component, config, resolve );
+        const result = await ccm[ component.ccm.version() ].instance( component, config, resolve );
         result && resolve( result );
       } );
 
