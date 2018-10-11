@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.0.1)
+ * @version 18.0.1
  * @changes
  * version 18.0.1 (11.10.2018): bug fix for ccm.helper.unescapeHTML and ccm.helper.protect
  * version 18.0.0 (30.09.2018): improved ccm.component, ccm.instance, ccm.start, ccm.store, ccm.get, ccm.set and ccm.del
