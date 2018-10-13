@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.0.5)
+ * @version 18.0.5
  * @changes
  * version 18.0.5 (13.10.2018): bug fix for ready callback of a component object
  * version 18.0.4 (12.10.2018): bug fix for ccm.helper.unescapeHTML
