@@ -6,7 +6,6 @@
 
 ccm.files[ 'ccm-tests.js' ] = {
   setup: ( suite, callback ) => {
-    suite.ccm.clear();
     suite.ccm.load.timeout = 300;
     suite.$ = suite.ccm.helper;
     callback();
@@ -226,10 +225,10 @@ ccm.files[ 'ccm-tests.js' ] = {
             if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
             const element = document.createElement( 'div' );
             document.body.appendChild( element );
-            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, element, instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
+            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, { root: element } ).then( instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
               if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
               suite.assertTrue( suite.check( suite.path, instance.element.parentNode ) );
-            } ) );
+            } ).catch( () => suite.failed() ) ).catch( () => suite.failed() );
           },
           'integrity': suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
           'corrupt':   suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISB', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed )
@@ -283,10 +282,10 @@ ccm.files[ 'ccm-tests.js' ] = {
             if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
             const element = document.createElement( 'div' );
             document.body.appendChild( element );
-            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, element, instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
+            suite.ccm.instance( { name: 'dummy', ccm: '../ccm.js', Instance: function () {} }, { root: element } ).then( instance => suite.ccm.load( { url: suite.path, context: instance } ).then( () => {
               if ( suite.check( suite.path ) ) return suite.failed( suite.msg );
               suite.assertTrue( suite.check( suite.path, instance.element.parentNode ) );
-            } ).catch( () => suite.failed() ) );
+            } ).catch( () => suite.failed() ) ).catch( () => suite.failed() );
           },
           'integrity': suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA', crossorigin: 'anonymous' } } ).then( suite.passed ).catch( () => suite.failed() ),
           'corrupt':   suite => suite.ccm.load( { url: suite.path, attr: { integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISB', crossorigin: 'anonymous' } } ).then( () => suite.failed() ).catch( suite.passed ),
@@ -428,21 +427,11 @@ ccm.files[ 'ccm-tests.js' ] = {
   store: {
     create: {
       tests: {
-        'local': function ( suite ) {
-          suite.ccm.store( {}, function ( store ) {
-            suite.assertTrue( suite.$.isDatastore( store ) );
-          } );
-        },
-        'client': function ( suite ) {
-          suite.ccm.store( { store: 'test' }, function ( store ) {
-            suite.assertTrue( suite.$.isDatastore( store ) );
-          } );
-        },
-        'server': function ( suite ) {
-          suite.ccm.store( { url: 'https://ccm.inf.h-brs.de', store: 'test' }, function ( store ) {
-            suite.assertTrue( suite.$.isDatastore( store ) );
-          } );
-        }
+        'local':    suite => suite.ccm.store().then( store => suite.assertTrue( suite.$.isDatastore( store ) ) ),
+        'client':   suite => suite.ccm.store( { name: 'test'                                                } ).then( store => suite.assertTrue( suite.$.isDatastore( store ) ) ),
+        'server':   suite => suite.ccm.store( { name: 'test', url: 'https://ccm2.inf.h-brs.de'              } ).then( store => suite.assertTrue( suite.$.isDatastore( store ) ) ),
+        'db':       suite => suite.ccm.store( { name: 'test', url: 'https://ccm2.inf.h-brs.de', db: 'redis' } ).then( store => suite.assertTrue( suite.$.isDatastore( store ) ) ),
+        'realtime': suite => suite.ccm.store( { name: 'test', url:   'wss://ccm2.inf.h-brs.de', db: 'redis' } ).then( store => suite.assertTrue( suite.$.isDatastore( store ) ) )
       }
     },
     get: {
@@ -1326,7 +1315,7 @@ ccm.files[ 'ccm-tests.js' ] = {
           callback();
         } );
       },
-      tests: {
+      _tests: {
         'keyframe': function ( suite ) {
           suite.$.loading( suite.dummy );
           suite.assertSame( '@keyframes ccm_loading { to { transform: rotate(360deg); } }', suite.dummy.element.parentNode.querySelector( '#ccm_keyframe' ).innerHTML );
@@ -1362,7 +1351,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       }
     },
     onFinish: {
-      tests: {
+      _tests: {
         'login': suite => {
           suite.ccm.instance( 'https://ccmjs.github.io/akless-components/user/versions/ccm.user-2.0.0.js', user =>
             user.logout( () =>
@@ -1456,7 +1445,7 @@ ccm.files[ 'ccm-tests.js' ] = {
             suite.ccm.store( { store: 'test', parent: { user: user } }, store => { suite.store = store; callback(); } );
           } );
         },
-        tests: {
+        _tests: {
           'simple': suite => {
             suite.store.parent.onfinish = {
               store: { settings: suite.settings, key: 'test' },
@@ -1504,7 +1493,7 @@ ccm.files[ 'ccm-tests.js' ] = {
       }
     },
     privatize: {
-      tests: {
+      _tests: {
         'someProperties': function ( suite ) {
           suite.ccm.instance( {
             name: 'dummy1',
@@ -1565,7 +1554,7 @@ ccm.files[ 'ccm-tests.js' ] = {
         suite.obj_key = 'dummy';
         callback();
       },
-      tests: {
+      _tests: {
         'callbackResult': function ( suite ) {
           var obj = { dummy: [ 'ccm.load', suite.url ] };
           suite.$.solveDependency( obj, suite.obj_key, function ( result ) {
