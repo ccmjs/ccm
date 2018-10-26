@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.0.7)
+ * @version 18.0.7
  * @changes
  * version 18.0.7 (26.10.2018): bug fix for parent reference of ccm datastores
  * version 18.0.6 (14.10.2018): bug fix for parent reference of ccm datastores
