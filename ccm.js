@@ -8,6 +8,7 @@
  * - ccm.load supports loading of specific ES6 module element
  * - new ccm.helper.onfinish settings property 'convert'
  * - ccm.helper.action works with external function (loaded via ES6 module)
+ * - ccm.helper.dataset allows 'convert' property in required data to determine dataset
  * version 18.0.7 (26.10.2018): bug fix for parent reference of ccm datastores
  * version 18.0.6 (14.10.2018): bug fix for parent reference of ccm datastores
  * version 18.0.5 (13.10.2018): bug fix for ready callback of a component object
@@ -1666,12 +1667,13 @@
         // should a user-specific key be used? => make key user-specific
         if ( self.helper.isInstance( user ) && settings.user && user.isLoggedIn() ) settings.key = [ user.data().user, settings.key ];
 
-        // request dataset from datastore
-        const dataset = await settings.store.get( settings.key );
+        // request dataset from datastore (not exists? => use empty dataset)
+        let dataset = await settings.store.get( settings.key ) || { key: settings.key };
 
-        // dataset not exists? => result is an empty dataset
-        return dataset ? dataset : { key: settings.key };
+        // has converter? => convert dataset
+        if ( settings.convert ) dataset = settings.convert( dataset );
 
+        return dataset;
       },
 
       /**
