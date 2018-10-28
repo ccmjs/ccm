@@ -7,6 +7,7 @@
  * version 18.1.0 (28.10.2018):
  * - ccm.load supports loading of specific ES6 module element
  * - new ccm.helper.onfinish settings property 'convert'
+ * - ccm.helper.action works with external function (loaded via ES6 module)
  * version 18.0.7 (26.10.2018): bug fix for parent reference of ccm datastores
  * version 18.0.6 (14.10.2018): bug fix for parent reference of ccm datastores
  * version 18.0.5 (13.10.2018): bug fix for ready callback of a component object
@@ -1499,16 +1500,19 @@
         // is function without parameters? => perform function
         if ( typeof action === 'function' ) return action();
 
-        if ( typeof action !== 'object' )
+        if ( !Array.isArray( action ) )
           action = action.split( ' ' );
+
+        // is external function? => import and perform
+        if ( self.helper.isObject( action[ 0 ] ) ) return new Promise( resolve => self.load( { url: action[ 0 ].module, type: 'module', import: action[ 0 ].import } ).then( result => resolve( result.apply( window, action.slice( 1 ) ) ) ) );
 
         if ( typeof action[ 0 ] === 'function' )
           return action[ 0 ].apply( window, action.slice( 1 ) );
         else
-        if ( action[ 0 ].indexOf( 'this.' ) === 0 )
-          return this.executeByName( action[ 0 ].substr( 5 ), action.slice( 1 ), context );
-        else
-          return this.executeByName( action[ 0 ], action.slice( 1 ) );
+          if ( action[ 0 ].indexOf( 'this.' ) === 0 )
+            return this.executeByName( action[ 0 ].substr( 5 ), action.slice( 1 ), context );
+          else
+            return this.executeByName( action[ 0 ], action.slice( 1 ) );
       },
 
       append: function ( parent, node ) {
