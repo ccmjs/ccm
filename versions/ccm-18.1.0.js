@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.1.0)
+ * @version 18.1.0
  * @changes
  * version 18.1.0 (28.10.2018):
  * - ccm.load supports loading of specific ES6 module element
