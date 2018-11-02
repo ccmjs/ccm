@@ -278,7 +278,7 @@
     this.set = priodata => new Promise( ( resolve, reject ) => {
 
       // no manipulation of passed original parameter (avoids unwanted side effects)
-      priodata = self.helper.clone( priodata );
+      priodata = self.helper.toJSON( priodata );
 
       // priority data has no key? => generate unique key
       if ( !priodata.key ) priodata.key = self.helper.generateKey();
