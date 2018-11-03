@@ -449,7 +449,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '18.2.0',
+    version: () => '18.3.0',
 
     /**
      * @summary global namespaces for registered ccm components
