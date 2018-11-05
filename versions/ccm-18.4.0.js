@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.4.0)
+ * @version 18.4.0
  * @changes
  * version 18.4.0 (05.11.2018):
  * - result of ccm.helper.toDotNotation can optionally contain all levels of dot notation
