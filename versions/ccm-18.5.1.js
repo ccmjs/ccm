@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.5.1)
+ * @version 18.5.1
  * @changes
  * version 18.5.1 (14.11.2018): bug fix for ccm.helper.solveDotNotation (deep copy of first parameter)
  * version 18.5.0 (14.11.2018): updated JSON handling
