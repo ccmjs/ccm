@@ -3167,13 +3167,14 @@
        * converts a value to a JSON string and removes not JSON valid data
        * @param {*} value
        * @param {function} [replacer]
+       * @param {string|number} [space]
        * @returns {string} JSON string
        */
-      stringify: ( value, replacer ) => JSON.stringify( value, ( key, value ) => {
+      stringify: ( value, replacer, space ) => JSON.stringify( value, ( key, value ) => {
         if ( typeof value === 'function' || self.helper.isSpecialObject( value ) )
           value = null;
         return replacer ? replacer( key, value ) : value;
-      } ),
+      }, space ),
 
       /**
        * transforms an object with deeper structure to a flat object with dot notation in each key as path to deeper properties
