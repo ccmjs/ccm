@@ -2,9 +2,8 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.6.1)
+ * @version latest (18.6.0)
  * @changes
- * version 18.6.1 (19.11.2018): bug fix for ccm.helper.parse()
  * version 18.6.0 (15.11.2018):
  * - ccm.helper.parse() supports optional reviver function as second parameter
  * - ccm.helper.stringify() supports optional replacer function as second parameter
@@ -460,7 +459,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '18.6.1',
+    version: () => '18.6.0',
 
     /**
      * @summary global namespaces for registered ccm components
@@ -2810,7 +2809,7 @@
       parse: ( string, reviver ) => JSON.parse( string
         .replace( /\\n/g, "\\n" )
         .replace( /\\'/g, "\\'" )
-        .replace( /"/g, '\\\"' )
+        .replace( /\\"/g, '\\"' )
         .replace( /\\&/g, "\\&" )
         .replace( /\\r/g, "\\r" )
         .replace( /\\t/g, "\\t" )
