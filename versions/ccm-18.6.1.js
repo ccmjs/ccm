@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.6.1)
+ * @version 18.6.1
  * @changes
  * version 18.6.1 (19.11.2018): bug fix for ccm.helper.parse()
  * version 18.6.0 (15.11.2018):
