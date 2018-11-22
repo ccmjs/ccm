@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.6.3)
+ * @version 18.6.3
  * @changes
  * version 18.6.3 (22.11.2018): bug fix for ccm.helper.html (no remove of 'key' property if it is a JSON string)
  * version 18.6.2 (22.11.2018): bug fix for ccm.helper.onFinish (use original key if store:true)
