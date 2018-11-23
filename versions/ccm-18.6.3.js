@@ -4,7 +4,9 @@
  * @license The MIT License (MIT)
  * @version 18.6.3
  * @changes
- * version 18.6.3 (22.11.2018): bug fix for ccm.helper.html (no remove of 'key' property if it is a JSON string)
+ * version 18.6.3 (22.11.2018): bug fixes for ccm.helper.html
+ * - no remove of 'key' property if it is a JSON string)
+ * - no replacement of " with &quot; for HTML attribute values
  * version 18.6.2 (22.11.2018): bug fix for ccm.helper.onFinish (use original key if store:true)
  * version 18.6.1 (21.11.2018): bug fix for ccm.helper.protect (filter script tags from string with regex instead of .innerHTML)
  * version 18.6.0 (15.11.2018):
@@ -2294,10 +2296,10 @@
 
             // HTML value attributes and events
             default:
-              if ( key.indexOf( 'on' ) === 0 && typeof value === 'function' )  // is HTML event
+              if ( key.indexOf( 'on' ) === 0 && typeof value === 'function' )               // is HTML event
                 element.addEventListener( key.substr( 2 ), value );
-              else                                                             // is HTML value attribute
-                element.setAttribute( key, self.helper.htmlEncode( value ) );
+              else                                                                          // is HTML value attribute
+                element.setAttribute( key, self.helper.htmlEncode( value, true, false ) );
           }
 
         }
