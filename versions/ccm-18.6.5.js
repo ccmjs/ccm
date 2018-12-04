@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.6.5)
+ * @version 18.6.5
  * @changes
  * version 18.6.5 (24.11.2018): bug fix at ccm.helper.onFinish for storing results in original datastore
  * version 18.6.4 (24.11.2018): bug fix for ccm.helper.formData (removed HTML encoding)
