@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2018
  * @license The MIT License (MIT)
- * @version latest (18.6.6)
+ * @version 18.6.6
  * @changes
  * version 18.6.6 (18.12.2018): bug fix for mutation observer and at ccm.helper.isDatastore()
  * version 18.6.5 (24.11.2018): bug fix at ccm.helper.onFinish for storing results in original datastore
