@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (18.6.7)
+ * @version 18.6.7
  * @changes
  * version 18.6.7 (02.01.2018):
  * - bug fix for update of a local managed dataset
