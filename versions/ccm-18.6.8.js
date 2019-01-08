@@ -2,8 +2,9 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version 18.6.7
+ * @version 18.6.8
  * @changes
+ * version 18.6.8 (08.01.2019): bug fix for solve ccm.get dependency
  * version 18.6.7 (02.01.2019):
  * - bug fix for update of a local managed dataset
  * - bug fix for set custom HTML attributes at ccm.load
@@ -470,7 +471,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '18.6.7',
+    version: () => '18.6.8',
 
     /**
      * @summary global namespaces for registered ccm components
@@ -3131,13 +3132,16 @@
           case 'instance':
           case 'proxy':
           case 'start':
-          case 'store':
-          case 'get':
           case 'set':
           case 'del':
             if ( !dependency[ operation === 'store' ? 0 : 1 ] ) dependency[ operation === 'store' ? 0 : 1 ] = {};
             dependency[ 1 ] = await self.helper.solveDependency( dependency[ 1 ], instance );
             if ( instance ) dependency[ operation === 'store' ? 0 : 1 ].parent = instance;
+            return await self[ operation ].apply( null, dependency );
+          case 'store':
+          case 'get':
+            if ( !dependency[ 0 ] ) dependency[ 0 ] = {};
+            if ( instance ) dependency[ 0 ].parent = instance;
             return await self[ operation ].apply( null, dependency );
         }
 
