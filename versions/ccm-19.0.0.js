@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (19.0.0)
+ * @version 19.0.0
  * @changes
  * version 19.0.0 (12.01.2019):
  * - datastores can be initialize with array of datasets for local cache
