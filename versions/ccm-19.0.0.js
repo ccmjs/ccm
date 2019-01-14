@@ -4,11 +4,12 @@
  * @license The MIT License (MIT)
  * @version 19.0.0
  * @changes
- * version 19.0.0 (12.01.2019):
+ * version 19.0.0 (14.01.2019):
  * - datastores can be initialize with array of datasets for local cache
  * - added help function 'arrToStore'
  * - updated regex for dataset key (character '-' is no more allowed)
  * - parameters of ccm.helper.replace are swapped
+ * - set Content-Type 'application/json' for POST requests via ccm.load
  * (for older version changes see ccm-18.6.8.js)
  */
 
@@ -730,6 +731,7 @@
             function ajax() {
               const request = new XMLHttpRequest();
               request.open( resource.method, resource.method === 'get' && resource.params ? buildURL( resource.url, resource.params ) : resource.url, true );
+              request.method === 'post' && request.setRequestHeader( 'Content-Type', 'application/json' );
               request.onreadystatechange = () => {
                 if ( request.readyState === 4 )
                   request.status === 200 ? successData( self.helper.regex( 'json' ).test( request.responseText ) ? self.helper.parse( request.responseText ) : request.responseText ) : error( request );
