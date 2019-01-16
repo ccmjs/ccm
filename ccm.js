@@ -2768,9 +2768,9 @@
             let config = settings.render.config;
             if ( !config ) config = {};
             const result = await self.start( settings.render.component, config );
-            self.helper.replace( result.root, instance.root );
+            self.helper.replace( instance.root, result.root );
           }
-          else self.helper.replace( self.helper.html( settings.render ), instance.root );
+          else self.helper.replace( instance.root, self.helper.html( settings.render ) );
 
         // perform finish callback (if necessary)
         settings.callback && settings.callback( instance, results );
