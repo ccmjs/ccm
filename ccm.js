@@ -4,12 +4,13 @@
  * @license The MIT License (MIT)
  * @version latest (19.0.0)
  * @changes
- * version 19.0.0 (14.01.2019):
+ * version 19.0.0 (16.01.2019):
  * - datastores can be initialize with array of datasets for local cache
  * - added help function 'arrToStore'
  * - updated regex for dataset key (character '-' is no more allowed)
  * - parameters of ccm.helper.replace are swapped
  * - set Content-Type 'application/json' for POST requests via ccm.load
+ * - bug fix for ccm.start dependency
  * (for older version changes see ccm-18.6.8.js)
  */
 
@@ -1293,6 +1294,9 @@
             // result has a ready function? => perform and delete ready function and check next result afterwards (recursive call)
             next.ready ? next.ready().then( () => { delete next.ready; ready(); } ) : ready();
 
+            // does the app have to be started directly? => do it
+            if ( next._start ) { delete next._start; next.start(); }
+
           }
 
         } );
@@ -1326,7 +1330,7 @@
      */
     start: async ( component, config ) => {
       const instance = await self.instance( component, config );
-      await instance.start();
+      instance.init ? ( instance._start = true ) : await instance.start();
       return instance;
     },
 
