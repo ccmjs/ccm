@@ -1274,7 +1274,7 @@
             const next = instances[ i++ ];
 
             // call and delete init method and continue with next founded ccm instance (recursive call)
-            next.init().then( () => { delete next.init; init(); } );
+            next.init ? next.init().then( () => { delete next.init; init(); } ) : init();
 
           }
 
