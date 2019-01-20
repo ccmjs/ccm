@@ -4,7 +4,7 @@
  * @license The MIT License (MIT)
  * @version 19.0.0
  * @changes
- * version 19.0.0 (16.01.2019):
+ * version 19.0.0 (20.01.2019):
  * - datastores can be initialize with array of datasets for local cache
  * - added help function 'arrToStore'
  * - updated regex for dataset key (character '-' is no more allowed)
