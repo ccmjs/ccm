@@ -11,6 +11,7 @@
  * - parameters of ccm.helper.replace are swapped
  * - set Content-Type 'application/json' for POST requests via ccm.load
  * - bug fix for ccm.start dependency
+ * - bug fix for creating local datastore without initial datasets
  * (for older version changes see ccm-18.6.8.js)
  */
 
@@ -1348,7 +1349,7 @@
       if ( typeof config === 'string' ) config = config.endsWith( '.js' ) ? { local: [ 'ccm.load', config ] } : { name: config };
 
       // is no datastore configuration? => use passed parameter for initial local cache
-      if ( !self.helper.isObject( config ) || ( !config.local && !config.name ) ) config = { local: config };
+      if ( !self.helper.isObject( config ) || ( !config.local && !config.name && !config.parent ) ) config = { local: config };
 
       // no initial local cache? => use empty object
       if ( !config.local && !config.name ) config.local = {};
