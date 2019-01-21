@@ -1349,7 +1349,7 @@
       if ( typeof config === 'string' ) config = config.endsWith( '.js' ) ? { local: [ 'ccm.load', config ] } : { name: config };
 
       // is no datastore configuration? => use passed parameter for initial local cache
-      if ( !self.helper.isObject( config ) || ( !config.local && !config.name && !config.parent ) ) config = { local: config };
+      if ( !self.helper.isObject( config ) || ( !config.local && !config.name ) ) config = { local: config };
 
       // no initial local cache? => use empty object
       if ( !config.local && !config.name ) config.local = {};
