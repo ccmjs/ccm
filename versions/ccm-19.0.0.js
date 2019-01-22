@@ -4,7 +4,7 @@
  * @license The MIT License (MIT)
  * @version 19.0.0
  * @changes
- * version 19.0.0 (20.01.2019):
+ * version 19.0.0 (22.01.2019):
  * - datastores can be initialize with array of datasets for local cache
  * - added help function 'arrToStore'
  * - updated regex for dataset key (character '-' is no more allowed)
@@ -12,6 +12,7 @@
  * - set Content-Type 'application/json' for POST requests via ccm.load
  * - bug fix for ccm.start dependency
  * - bug fix for creating local datastore without initial datasets
+ * - component ready() has component object for 'this'
  * (for older version changes see ccm-18.6.8.js)
  */
 
@@ -904,7 +905,7 @@
         component.ccm = ccm[ version ];  // add ccm framework reference
 
         // initialize component
-        if ( component.ready ) await component.ready(); delete component.ready;
+        component.ready && await component.ready.call( component ); delete component.ready;
 
         // define HTML tag for component
         await defineCustomElement();
