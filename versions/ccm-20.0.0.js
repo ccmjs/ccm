@@ -4,8 +4,9 @@
  * @license The MIT License (MIT)
  * @version 20.0.0
  * @changes
- * version 20.0.0 (23.01.2019):
+ * version 20.0.0 (25.01.2019):
  * - no solving of data dependencies when requesting a dataset
+ * - added ccm.helper.hasDomContact(instance):boolean
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -2163,6 +2164,13 @@
         return split.join( '-' );
 
       },
+
+      /**
+       * checks if an instance has DOM contact
+       * @param {ccm.types.instance} instance
+       * @returns {boolean}
+       */
+      hasDomContact: instance => document.contains( self.context.root( instance ).root ),
 
       hide: function ( instance ) {
         instance.element.parentNode.appendChild( self.helper.loading( instance ) );
