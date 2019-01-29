@@ -4,9 +4,10 @@
  * @license The MIT License (MIT)
  * @version 20.0.0
  * @changes
- * version 20.0.0 (25.01.2019):
+ * version 20.0.0 (29.01.2019):
  * - no solving of data dependencies when requesting a dataset
  * - added ccm.helper.hasDomContact(instance):boolean
+ * - default change callback for ccm datastores
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -135,6 +136,9 @@
 
         // is no ccm realtime datastore? => abort
         if ( !that.url || that.url.indexOf( 'ws' ) !== 0 ) return resolve();
+
+        // no change callback and not a standalone datastore? => set default change callback: restart parent
+        if ( !that.onchange && that.parent ) that.onchange = that.parent.start;
 
         // prepare initial message
         let message = [ that.db, that.name ];
