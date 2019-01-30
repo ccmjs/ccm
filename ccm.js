@@ -4,10 +4,11 @@
  * @license The MIT License (MIT)
  * @version latest (20.0.0)
  * @changes
- * version 20.0.0 (29.01.2019):
+ * version 20.0.0 (30.01.2019):
  * - no solving of data dependencies when requesting a dataset
  * - added ccm.helper.hasDomContact(instance):boolean
  * - default change callback for ccm datastores
+ * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -2661,7 +2662,7 @@
        *   log: true,
        *   clear: true,
        *   store: {
-       *     settings: { store: 'example', url: 'path/to/server/interface.php' },
+       *     settings: { name: 'example', url: 'path/to/server/interface.php' },
        *     key: 'example',
        *     user: true,
        *     unique: true,
@@ -2738,7 +2739,14 @@
           const dataset = self.helper.clone( results );
 
           // allow shortcut for update dataset in its original datastore
-          if ( settings.store === true ) settings.store = {};
+          if ( settings.store === true ) {
+            settings.store = {};
+            if ( self.helper.isObject( instance.data ) && self.helper.isDatastore( instance.data.store ) ) {
+              settings.store = self.helper.clone( instance.data );
+              settings.store.settings = settings.store.store.source();
+              delete settings.store.store;
+            }
+          }
 
           // prepare dataset key
           if ( settings.store.key ) dataset.key = settings.store.key;
@@ -2749,21 +2757,11 @@
           // prepare permission settings
           if ( settings.store.permissions ) dataset._ = settings.store.permissions;
 
-          // has store settings?
-          if ( settings.store.settings ) {
+          // set user instance for datastore
+          if ( user ) settings.store.settings.user = user;
 
-            // set user instance for datastore
-            if ( user ) settings.store.settings.user = user;
-
-            // store result data in datastore
-            await self.set( settings.store.settings, dataset );
-
-          }
-          // update dataset in its original datastore
-          else if ( self.helper.isObject( instance.data ) && self.helper.isDatastore( instance.data.store ) ) {
-            dataset.key = instance.data.key;
-            await instance.data.store.set( dataset );
-          }
+          // store result data in datastore
+          await self.set( settings.store.settings, dataset );
 
         }
 
