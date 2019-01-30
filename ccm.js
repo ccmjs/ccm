@@ -1664,7 +1664,7 @@
         if ( user && settings.login ) await user.login();
 
         // should a user-specific key be used? => make key user-specific
-        if ( self.helper.isInstance( user ) && settings.user && user.isLoggedIn() ) settings.key = [ user.data().user, settings.key ];
+        if ( self.helper.isInstance( user ) && settings.user && user.isLoggedIn() ) settings.key = [ settings.key, user.data().user ];
 
         // request dataset from datastore (not exists? => use empty dataset)
         let dataset = await settings.store.get( settings.key ) || { key: settings.key };
