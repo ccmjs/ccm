@@ -9,6 +9,7 @@
  * - added ccm.helper.hasDomContact(instance):boolean
  * - default change callback for ccm datastores
  * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
+ * - bug fix for request a not existing dataset from IndexedDB
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -222,7 +223,7 @@
       function clientDB() {
 
         const request = getStore().get( key_or_query );
-        request.onsuccess = event => ( event.target.result && event.target.result.key === key_or_query ? resolve : reject )( event.target.result || null );
+        request.onsuccess = event => resolve( event.target.result || null );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
