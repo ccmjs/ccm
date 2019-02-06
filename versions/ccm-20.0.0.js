@@ -4,12 +4,13 @@
  * @license The MIT License (MIT)
  * @version 20.0.0
  * @changes
- * version 20.0.0 (30.01.2019):
+ * version 20.0.0 (06.02.2019):
  * - no solving of data dependencies when requesting a dataset
  * - added ccm.helper.hasDomContact(instance):boolean
  * - default change callback for ccm datastores
  * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
  * - bug fix for request a not existing dataset from IndexedDB
+ * - bug fix for ccm.helper.replace
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -2993,11 +2994,7 @@
         delete obj[ before ];
       },
 
-      replace: ( oldnode, newnode ) => {
-
-        oldnode.parentNode && oldnode.parentNode.replaceChild( self.helper.protect( newnode ), oldnode );
-
-      },
+      replace: ( oldnode, newnode ) => oldnode.parentNode && oldnode.parentNode.replaceChild( self.helper.protect( newnode ), oldnode ),
 
       /**
        * @summary set the content of an HTML element
