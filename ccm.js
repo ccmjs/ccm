@@ -11,6 +11,7 @@
  * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
  * - bug fix for request a not existing dataset from IndexedDB
  * - bug fix for ccm.helper.replace
+ * - updated ccm.helper.format
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -1892,41 +1893,72 @@
       format: function ( data, values ) {
 
         const temp = [[],[],{}];
-        const args = self.helper.clone( [ ...arguments ] );
+        const obj_mode = self.helper.isObject( data );
 
-        data = JSON.stringify( data, function ( key, val ) {
+        // convert given values to real array
+        values = self.helper.clone( [ ...arguments ] ); values.shift();
+
+        // convert data to string
+        data = self.helper.stringify( data, ( key, val ) => {
+
+          // rescue all functions and replace them with special placeholder
           if ( typeof val === 'function' ) { temp[ 0 ].push( val ); return '%$0%'; }
+
           return val;
         } );
 
-        var obj_mode = data.indexOf( '{' ) === 0;
+        // replace placeholders with values
+        for ( let i = 0; i < values.length; i++ ) {
 
-        for ( var i = 1; i < args.length; i++ ) {
-          if ( typeof args[ i ] === 'object' )
-            for ( var key in args[ i ] ) {
-              if ( typeof args[ i ][ key ] === 'string' )
-                ;
-              else if ( obj_mode ) {
-                temp[ 2 ][ key ] = args[ i ][ key ];
-                args[ i ][ key ] = '%$2%'+key+'%';
+          // value is object or array? => iterate each contained value
+          if ( typeof values[ i ] === 'object' ) {
+            for ( const key in values[ i ] )
+              if ( values[ i ].hasOwnProperty( key ) ) {
+
+                // value is not a string and data is object?
+                if ( typeof values[ i ][ key ] !== 'string' && obj_mode ) {
+                  temp[ 2 ][ key ] = values[ i ][ key ];                     // rescue value
+                  values[ i ][ key ] = `%$2%${key}%`;                        // replace value with special placeholder
+                }
+
+                // replace all associated placeholders with value
+                data = data.replace( new RegExp( `%${key}%`, 'g' ), values[ i ][ key ] );
+
               }
-              data = data.replace( new RegExp( '%'+key+'%', 'g' ), args[ i ][ key ] );
-            }
-          else {
-            if ( typeof args[ i ] === 'string' )
-              ;
-            else if ( obj_mode ) {
-              temp[ 1 ].push( args[ i ] );
-              args[ i ] = '%$1%';
-            }
-            data = data.replace( /%%/, args[ i ] );
           }
+
+          // neither object nor array
+          else {
+
+            // value is not a string and data is object? => rescue value and replace it with special placeholder
+            if ( typeof values[ i ] !== 'string' && obj_mode ) {
+              temp[ 1 ].push( values[ i ] );                      // rescue value
+              values[ i ] = '%$1%';                               // replace value with special placeholder
+            }
+
+            // replace first occurrence of empty placeholder with value
+            data = data.replace( /%%/, values[ i ] );
+
+          }
+
         }
 
-        return self.helper.parse( data, function ( key, val ) {
+        // convert data from string back to original
+        return self.helper.parse( data, ( key, val ) => {
+
+          // replace special placeholders with rescued values
           if ( val === '%$0%' ) return temp[ 0 ].shift();
           if ( val === '%$1%' ) return temp[ 1 ].shift();
-          if ( typeof val === 'string' && val.indexOf( '%$2%' ) === 0 ) return temp[ 2 ][ val.split( '%' )[ 2 ] ];
+          if ( typeof val === 'string' ) {
+
+            // is standalone placeholder => keep original datatype
+            if ( val.indexOf( '%$2%' ) === 0 ) return temp[ 2 ][ val.split( '%' )[ 2 ] ];
+
+            // placeholder is part of string? => replace (datatype is converted to string)
+            else if ( val.includes( '%$2%' ) ) return val.replace( `%$2%${val.split('%')[2]}%`, temp[ 2 ][ val.split( '%' )[ 2 ] ] );
+
+          }
+
           return val;
         } );
 
