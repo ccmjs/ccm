@@ -8,6 +8,7 @@
  * - no solving of data dependencies when requesting a dataset
  * - added ccm.helper.hasDomContact(instance):boolean
  * - default change callback for ccm datastores
+ * - updated ccm.helper.dataset: set given permission settings for a new dataset
  * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
  * - bug fix for request a not existing dataset from IndexedDB
  * - bug fix for ccm.helper.replace
@@ -1670,7 +1671,7 @@
         if ( self.helper.isInstance( user ) && settings.user && user.isLoggedIn() ) settings.key = [ settings.key, user.data().user ];
 
         // request dataset from datastore (not exists? => use empty dataset)
-        let dataset = await settings.store.get( settings.key ) || { key: settings.key };
+        let dataset = await settings.store.get( settings.key ) || { key: settings.key, _: settings.permissions };
 
         // has converter? => convert dataset
         if ( settings.convert ) dataset = settings.convert( dataset );
