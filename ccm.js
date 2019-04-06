@@ -13,6 +13,7 @@
  * - bug fix for request a not existing dataset from IndexedDB
  * - bug fix for ccm.helper.replace
  * - updated ccm.helper.format
+ * - updated ccm.helper.filterProperties
  * (for older version changes see ccm-19.0.0.js)
  */
 
@@ -1856,14 +1857,27 @@
 
       },
 
+      /**
+       * filters properties from an object
+       * @param {Object} obj
+       * @param {...string} [properties] - values to replace placeholder
+       * @return {Object} filtered properties
+       * @example ccm.helper.filterProperties( {a:'x',b:'y',c:'z'}, 'a', 'b' );  // => {a:'x',b:'y'}
+       */
       filterProperties: function ( obj, properties ) {
-        var result = {};
-        properties = self.helper.makeIterable( arguments );
-        properties.shift();
-        properties.map( function ( property ) {
+
+        /**
+         * filtered properties
+         * @type {Object}
+         */
+        const result = {};
+
+        properties = [ ...arguments ]; properties.shift();
+        properties.forEach( property => {
           if ( obj[ property ] !== undefined )
             result[ property ] = obj[ property ];
         } );
+
         return result;
       },
 
@@ -1953,10 +1967,12 @@
           if ( typeof val === 'string' ) {
 
             // is standalone placeholder => keep original datatype
-            if ( val.indexOf( '%$2%' ) === 0 ) return temp[ 2 ][ val.split( '%' )[ 2 ] ];
+            if ( val.indexOf( '%$2%' ) === 0 && val.split( '%' )[ 3 ] === '' ) return temp[ 2 ][ val.split( '%' )[ 2 ] ];
 
             // placeholder is part of string? => replace (datatype is converted to string)
-            else if ( val.includes( '%$2%' ) ) return val.replace( `%$2%${val.split('%')[2]}%`, temp[ 2 ][ val.split( '%' )[ 2 ] ] );
+            else
+              for ( const key in temp[ 2 ] )
+                val = val.replace( new RegExp( `%\\$2%${key}%`, 'g' ), temp[ 2 ][ key ] );
 
           }
 
