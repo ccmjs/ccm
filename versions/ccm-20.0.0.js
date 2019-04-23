@@ -2851,7 +2851,8 @@
         .replace( /\\r/g, "\\r" )
         .replace( /\\t/g, "\\t" )
         .replace( /\\b/g, "\\b" )
-        .replace( /\\f/g, "\\f" ), reviver
+        .replace( /\\f/g, "\\f" )
+        .replace( /[\u0000-\u0019]+/g, "" ), reviver
       ),
 
       prepend: function ( parent, node ) {
