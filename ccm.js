@@ -1672,7 +1672,11 @@
         if ( self.helper.isInstance( user ) && settings.user && user.isLoggedIn() ) settings.key = [ settings.key, user.data().user ];
 
         // request dataset from datastore (not exists? => use empty dataset)
-        let dataset = await settings.store.get( settings.key ) || { key: settings.key, _: settings.permissions };
+        let dataset = await settings.store.get( settings.key );
+        if ( !dataset ) {
+          dataset = { key: settings.key };
+          if ( settings.permissions ) dataset._ = settings.permissions;
+        }
 
         // has converter? => convert dataset
         if ( settings.convert ) dataset = settings.convert( dataset );
