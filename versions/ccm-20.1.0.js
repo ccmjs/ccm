@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.1.0)
+ * @version 20.1.0
  * @changes
  * version 20.1.0 (27.04.2019):
  * - ccm.helper.isSubset supports check of deeper values via dot notation
