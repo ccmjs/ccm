@@ -6,6 +6,7 @@
  * @changes
  * version 20.1.0 (27.04.2019):
  * - ccm.helper.isSubset supports check of deeper values via dot notation
+ * - updated ccm.helper.privatize: property 'data' counts as ccm relevant instance property and will not privatized
  * version 20.0.0 (06.02.2019):
  * - no solving of data dependencies when requesting a dataset
  * - added ccm.helper.hasDomContact(instance):boolean
@@ -2883,16 +2884,19 @@
        * If no properties are given, then all not <i>ccm</i> relevant instance properties will be privatized.
        * List of <i>ccm</i> relevant properties that could not be privatized:
        * <ul>
-       *   <li><code>childNodes</code></li>
+       *   <li><code>ccm</code></li>
        *   <li><code>component</code></li>
+       *   <li><code>config</code></li>
+       *   <li><code>data</code></li>
+       *   <li><code>dependency</code></li>
        *   <li><code>element</code></li>
        *   <li><code>id</code></li>
        *   <li><code>index</code></li>
        *   <li><code>onfinish</code></li>
-       *   <li><code>node</code></li>
        *   <li><code>parent</code></li>
+       *   <li><code>root</code></li>
        * </ul>
-       * In addition to this properties all functions and depending <i>ccm</i> context relevant <i>ccm</i> instances will also not be privatized.
+       * In addition to this: All functions and depending <i>ccm</i> context relevant <i>ccm</i> instances will also not be privatized.
        * @param {ccm.types.instance} instance - <i>ccm</i> instance
        * @param {...string|boolean} [properties] - properties that have to privatized, default: privatizes all not <i>ccm</i> relevant properties (if true: privatize all but don't remove privatized properties in instance)
        * @returns {Object} object that contains the privatized properties and there values
@@ -2951,6 +2955,7 @@
             case 'ccm':
             case 'component':
             case 'config':
+            case 'data':
             case 'dependency':
             case 'element':
             case 'id':
