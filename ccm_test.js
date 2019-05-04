@@ -966,6 +966,7 @@
               console.log('adopted!',this,arguments);
             }
             connectedCallback() {
+              console.log('connected!',this,arguments);
               if ( !document.body.contains( this ) ) return;
               let node = this;
               while ( node = node.parentNode )
