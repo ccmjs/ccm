@@ -422,7 +422,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '20.1.0',
+    version: () => '20.0.0',
 
     /**
      * @summary global namespaces for registered ccm components
