@@ -967,7 +967,7 @@
               while ( node = node.parentNode )
                 if ( node.tagName && node.tagName.indexOf( 'CCM-' ) === 0 )
                   return;
-              self.helper.wait( 1, () => {
+              self.helper.wait( 1, () => {                          // https://stackoverflow.com/questions/48663678/how-to-have-a-connectedcallback-for-when-all-child-custom-elements-have-been-c
                 const config = self.helper.generateConfig( this );
                 this.removeAttribute( 'key' );
                 config.root = this;
