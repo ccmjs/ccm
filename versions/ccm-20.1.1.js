@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.1.1)
+ * @version 20.1.1
  * @changes
  * version 20.1.1 (04.05.2019):
  * - removed property 'key' in all priority stages of instance configurations
