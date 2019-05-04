@@ -972,11 +972,11 @@
               while ( node = node.parentNode )
                 if ( node.tagName && node.tagName.indexOf( 'CCM-' ) === 0 )
                   return;
-              self.helper.wait( 1, () => {
+              self.helper.wait( 1, async () => {
                 const config = self.helper.generateConfig( this );
                 this.removeAttribute( 'key' );
                 config.root = this;
-                component.start( config );
+                await component.start( config );
               } );
             }
           } );
