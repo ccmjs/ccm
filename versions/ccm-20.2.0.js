@@ -2,8 +2,15 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.1.0)
+ * @version latest (20.2.0)
  * @changes
+ * version 20.2.0 (05.05.2019):
+ * - added ccm.helper.sleep
+ * - use of ccm.helper.sleep in connected callback of ccm Custom Elements instead of ccm.helper.timeout
+ * version 20.1.2 (05.05.2019):
+ * - bug fix for connected callback of ccm Custom Elements
+ * version 20.1.1 (04.05.2019):
+ * - removed property 'key' in all priority stages of instance configurations
  * version 20.1.0 (27.04.2019):
  * - ccm.helper.isSubset supports check of deeper values via dot notation
  * - updated ccm.helper.privatize: property 'data' counts as ccm relevant instance property and will not privatized
@@ -422,7 +429,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '20.0.0',
+    version: () => '20.2.0',
 
     /**
      * @summary global namespaces for registered ccm components
@@ -959,25 +966,17 @@
           const name = 'ccm-' + component.index;
           if ( customElements.get( name ) ) return;
           window.customElements.define( name, class extends HTMLElement {
-            disconnectedCallback(a,b) {
-              console.log('disconnected!',this,arguments);
-            }
-            adoptedCallback(a,b) {
-              console.log('adopted!',this,arguments);
-            }
-            connectedCallback() {
-              console.log('connected!',this,arguments);
+            async connectedCallback() {
               if ( !document.body.contains( this ) ) return;
               let node = this;
               while ( node = node.parentNode )
                 if ( node.tagName && node.tagName.indexOf( 'CCM-' ) === 0 )
                   return;
-              self.helper.wait( 1, async () => {
-                const config = self.helper.generateConfig( this );
-                this.removeAttribute( 'key' );
-                config.root = this;
-                await component.start( config );
-              } );
+              await self.helper.sleep( 0 );
+              const config = self.helper.generateConfig( this );
+              this.removeAttribute( 'key' );
+              config.root = this;
+              await component.start( config );
             }
           } );
 
@@ -3109,6 +3108,13 @@
       },
 
       /**
+       * sleep for a given number of milliseconds
+       * @param {number} time - sleep time in milliseconds
+       * @returns {Promise<void>}
+       */
+      sleep: async time => new Promise( resolve => setTimeout( resolve, time ) ),
+
+      /**
        * @summary solves ccm dependencies contained in an object or array
        * @param {Object|Array} obj - object or array
        * @param {ccm.types.instance} [instance] - associated ccm instance
@@ -3302,11 +3308,11 @@
   };
 
   /**
-   * @summary timeout limit (in ms) for loading a resource
+   * @summary timeout limit (in ms) for loading a resource (default: no timeout)
    * @memberOf ccm
    * @type {number}
    */
-  self.load.timeout = 10000;
+  self.load.timeout = 0;
 
   // set framework version specific namespace
   if ( self.version && !ccm[ self.version() ] ) ccm[ self.version() ] = self;
@@ -3329,10 +3335,13 @@
     let result = defaults;
 
     // integrate base configuration (config key property)
-    result = self.helper.integrate( await self.helper.solveDependency( config.key ), result ); delete config.key;
+    result = self.helper.integrate( await self.helper.solveDependency( config.key ), result );
 
     // integrate instance configuration
     result = self.helper.integrate( config, result );
+
+    // delete reserved property 'key' (no component developer should use it)
+    delete result.key;
 
     return result;
   }
