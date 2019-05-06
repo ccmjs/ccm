@@ -9,7 +9,7 @@
  * version 20.2.0 (05.05.2019):
  * - added ccm.helper.sleep
  * - use of ccm.helper.sleep in connected callback of ccm Custom Elements instead of ccm.helper.timeout
- * - default of self.helper.timeout is set to 0 (no timeout)
+ * - default of self.load.timeout is set to 0 (no timeout)
  * version 20.1.2 (05.05.2019):
  * - bug fix for connected callback of ccm Custom Elements
  * version 20.1.1 (04.05.2019):
