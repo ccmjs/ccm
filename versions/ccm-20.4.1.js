@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.4.1)
+ * @version 20.4.1
  * @changes
  * version 20.4.1 (16.05.2019):
  * - bug fix in ccm.helper.formData (string values with escaped double quotes)
