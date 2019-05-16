@@ -904,15 +904,6 @@
       // no component object? => throw error
       if ( !self.helper.isComponent( component ) ) return new Error( 'invalid component object' );
 
-      /*
-      // component should use other ccm framework version? => change used framework version in component object
-      const source = config && config.ccm;
-      if ( source ) {
-        component.ccm = ccm[ ( await self.helper.loadFramework( source ) ).version() ];
-        component.ccm.url = self.helper.isObject( source ) ? source.url : source;        // (considers backward compatibility)
-      }
-      */
-
       // set component index
       component.index = component.name + ( component.version ? '-' + component.version.join( '-' ) : '' );
 
