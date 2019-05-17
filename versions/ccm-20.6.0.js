@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.6.0)
+ * @version 20.6.0
  * @changes
  * version 20.6.0 (17.05.2019):
  * - show loading icon during instance generation
