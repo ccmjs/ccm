@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.6.2)
+ * @version 20.6.2
  * @changes
  * version 20.6.2 (19.05.2019):
  * - bug fix change of component used framework version via config
