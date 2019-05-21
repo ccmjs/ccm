@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.7.0)
+ * @version 20.7.0
  * @changes
  * version 20.7.0 (21.05.2019):
  * - proxy instances allow subsequent adaptation of instance configuration
