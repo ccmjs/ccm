@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (20.7.2)
+ * @version 20.7.2
  * @changes
  * version 20.7.2 (29.05.2019):
  * - bug fix for ccm.helper.removeElement(element):void
