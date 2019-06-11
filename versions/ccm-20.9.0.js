@@ -782,7 +782,7 @@
             function ajax() {
               const request = new XMLHttpRequest();
               request.open( resource.method, resource.method === 'get' && resource.params ? buildURL( resource.url, resource.params ) : resource.url, true );
-              resource.method === 'post' && request.setRequestHeader( 'Content-Type', 'application/json' );
+              ( resource.method === 'post' || resource.method === 'put' ) && request.setRequestHeader( 'Content-Type', 'application/json' );
               request.onreadystatechange = () => {
                 if ( request.readyState === 4 )
                   request.status >= 200 && request.status < 300 ? successData( self.helper.regex( 'json' ).test( request.responseText ) ? self.helper.parse( request.responseText ) : request.responseText ) : error( request );
