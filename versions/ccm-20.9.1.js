@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version 20.9.1
+ * @version latest (20.9.1)
  * @changes
  * version 20.9.1 (11.06.2019):
  * - bug fix for ccm.helper.regex: accept newline characters in a json string
