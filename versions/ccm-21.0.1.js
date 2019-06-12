@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (21.0.1)
+ * @version 21.0.1
  * @changes
  * version 21.0.1 (12.06.2019):
  * - try-catch for JSON.parse in ccm.load at data exchange result
