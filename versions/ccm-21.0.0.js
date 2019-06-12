@@ -7,61 +7,7 @@
  * version 21.0.0 (12.06.2019):
  * - ccm datastore level 2 (Indexed DB) supports query of all datasets with store.get({})
  * - loading data via ccm.load always performs JSON.parse on response
- * version 20.9.1 (11.06.2019):
- * - bug fix for ccm.helper.regex: accept newline characters in a json string
- * version 20.9.0 (11.06.2019):
- * - AJAX calls via ccm.load support PUT and DELETE
- * version 20.8.0 (11.06.2019):
- * - AJAX calls succeed not only on status 200 (accepted range: 200 <= status < 300)
- * version 20.7.3 (11.06.2019):
- * - bug fix for ccm.helper.html on {inner:null}
- * version 20.7.2 (29.05.2019):
- * - bug fix for ccm.helper.removeElement(element):void
- * version 20.7.1 (21.05.2019):
- * - padding for ccm loading symbol
- * version 20.7.0 (21.05.2019):
- * - proxy instances allow subsequent adaptation of instance configuration
- * version 20.6.2 (19.05.2019):
- * - bug fix change of component used framework version via config
- * version 20.6.1 (17.05.2019):
- * - bug fix for ccm.proxy
- * version 20.6.0 (17.05.2019):
- * - show loading icon during instance generation
- * version 20.5.2 (17.05.2019):
- * - improved backward compatibility for change of component used framework version via config
- * version 20.5.1 (17.05.2019):
- * - bug fix for loading a framework version with subresource integrity
- * version 20.5.0 (16.05.2019):
- * - added ccm.helper.loadFramework(url):Promise<Object> (loads a specific ccm framework version and returns the ccm object)
- * - ccm version can be set via instance configuration
- * version 20.4.1 (16.05.2019):
- * - bug fix in ccm.helper.formData (string values with escaped double quotes)
- * version 20.4.0 (15.05.2019):
- * - allow '-' in dataset keys
- * version 20.3.0 (05.05.2019):
- * - updated ccm.helper.onFinish: settings.store.key === true enforces generation of a new key
- * version 20.2.0 (05.05.2019):
- * - added ccm.helper.sleep
- * - use of ccm.helper.sleep in connected callback of ccm Custom Elements instead of ccm.helper.timeout
- * - default of self.load.timeout is set to 0 (no timeout)
- * version 20.1.2 (05.05.2019):
- * - bug fix for connected callback of ccm Custom Elements
- * version 20.1.1 (04.05.2019):
- * - removed property 'key' in all priority stages of instance configurations
- * version 20.1.0 (27.04.2019):
- * - ccm.helper.isSubset supports check of deeper values via dot notation
- * - updated ccm.helper.privatize: property 'data' counts as ccm relevant instance property and will not privatized
- * version 20.0.0 (06.02.2019):
- * - no solving of data dependencies when requesting a dataset
- * - added ccm.helper.hasDomContact(instance):boolean
- * - default change callback for ccm datastores
- * - updated ccm.helper.dataset: set given permission settings for a new dataset
- * - updated ccm.helper.onFinish: improved shortcut for update dataset in its original datastore
- * - bug fix for request a not existing dataset from IndexedDB
- * - bug fix for ccm.helper.replace
- * - updated ccm.helper.format
- * - updated ccm.helper.filterProperties
- * (for older version changes see ccm-19.0.0.js)
+ * (for older version changes see ccm-20.9.1.js)
  */
 
 ( () => {
