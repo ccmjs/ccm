@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (21.0.0)
+ * @version 21.0.0
  * @changes
  * version 21.0.0 (12.06.2019):
  * - ccm datastore level 2 (Indexed DB) supports query of all datasets with store.get({})
