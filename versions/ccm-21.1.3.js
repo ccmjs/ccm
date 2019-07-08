@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (21.1.3)
+ * @version 21.1.3
  * @changes
  * version 21.1.3 (08.07.2019):
  * - user must log in again and app restarts when token is expired during a data operation
