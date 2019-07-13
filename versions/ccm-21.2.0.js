@@ -4,7 +4,7 @@
  * @license The MIT License (MIT)
  * @version 21.2.0
  * @changes
- * version 21.2.0 (15.07.2019):
+ * version 21.2.0 (12.07.2019):
  * - ccm.load allows setup of request headers
  * version 21.1.3 (08.07.2019):
  * - user must log in again and app restarts when token is expired during a data operation

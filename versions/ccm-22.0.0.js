@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.0.0)
+ * @version 22.0.0
  * @changes
  * version 22.0.0 (13.07.2019):
  * - ccm.load loads HTML via HTTP GET request (no more support for HTML import)
