@@ -2314,6 +2314,10 @@
           div.appendChild( html );
           html = div;
 
+          // only one child? => use child as root element
+          if ( html.children.length === 1 )
+            html = html.firstChild;
+
         }
 
         // no HTML Element? => return it as result
@@ -2330,8 +2334,8 @@
         [ ...html.childNodes ].forEach( child =>
           json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent )
         );
-        if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
         if ( !json.inner.length ) delete json.inner;
+        if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
 
         return json;
       },
