@@ -2335,7 +2335,7 @@
           json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent )
         );
         if ( !json.inner.length ) delete json.inner;
-        if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
+        else if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
 
         return json;
       },
