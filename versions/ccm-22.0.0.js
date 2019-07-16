@@ -2303,14 +2303,20 @@
           html = fragment;
         }
 
-        // is document fragment? => transfer children to an empty on-the-fly <div>
+        // is document fragment?
         if ( html instanceof DocumentFragment ) {
+
+          // content is only text? => return text as result
+          if ( !html.children.length ) return html.textContent;
+
+          // transfer children to an empty on-the-fly <div>
           const div = document.createElement( 'div' );
           div.appendChild( html );
           html = div;
+
         }
 
-        // no HTML Element? => abort
+        // no HTML Element? => return it as result
         if ( !self.helper.isElementNode( html ) ) return html;
 
         // catch tag name
