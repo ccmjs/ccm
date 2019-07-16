@@ -2314,8 +2314,16 @@
           div.appendChild( html );
           html = div;
 
+          // remove whitespaces and empty Text Nodes
+          [ ...html.childNodes ].forEach( child => {
+            if ( child.nodeValue ) {
+              child.nodeValue = child.nodeValue.trim();
+              if ( !child.nodeValue ) self.helper.removeElement( child );
+            }
+          } );
+
           // only one child? => use child as root element
-          if ( html.children.length === 1 )
+          if ( html.childNodes.length === 1 )
             html = html.firstChild;
 
         }
@@ -2331,11 +2339,16 @@
         [ ...html.attributes ].forEach( attr => json[ attr.name ] = attr.value );
 
         // catch inner HTML (recursive)
-        [ ...html.childNodes ].forEach( child =>
-          json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent )
-        );
-        if ( !json.inner.length ) delete json.inner;
-        else if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
+        [ ...html.childNodes ].forEach( child => {
+          if ( child.nodeValue )
+            child.nodeValue = child.nodeValue.trim();
+          if ( self.helper.isElementNode( child ) || child.nodeValue )
+            json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent );
+        } );
+        if ( !json.inner.length )
+          delete json.inner;
+        else if ( json.inner.length === 1 )
+          json.inner = json.inner[ 0 ];
 
         return json;
       },
