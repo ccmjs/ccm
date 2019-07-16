@@ -4,8 +4,11 @@
  * @license The MIT License (MIT)
  * @version latest (22.0.0)
  * @changes
- * version 22.0.0 (13.07.2019):
+ * version 22.0.0 (16.07.2019):
  * - ccm.load loads HTML via HTTP GET request (no more support for HTML import)
+ * - added 'ccm.helper.htmlToJson(html):json'
+ * - loading of HTML with ccm.load always results in ccm HTML data (JSON)
+ * - updated ccm.helper.html
  * (for older version changes see ccm-21.2.0.js)
  */
 
@@ -801,8 +804,8 @@
             // received data is a JSON string? => parse it to JSON
             if ( typeof data === 'string' ) try { data = self.helper.parse( data ); } catch ( e ) {}
 
-            // received data is a HTML string? => transform to a document fragment
-            if ( resource.type === 'html' ) data = self.helper.html( data );
+            // received data is a HTML string? => transform to ccm HTML data
+            if ( resource.type === 'html' ) data = self.helper.htmlToJson( data );
 
             // add received data to results of ccm.load call and to cache
             results[ i ] = self.helper.protect( data );
@@ -2277,26 +2280,66 @@
       },
 
       /**
-       * @summary generate HTML with JSON (recursive)
-       * @param {string|ccm.types.html|ccm.types.html[]|Element|jQuery} html - <i>ccm</i> HTML data
-       * @param {...string} [values] - values to replace placeholder
-       * @returns {Element|Element[]} generated HTML
+       * converts HTML to ccm HTML data
+       * @param {string|jQuery|DocumentFragment|Element} html
+       * @returns {Object} ccm HTML data
        */
-      html: function( html, values ) {
+      htmlToJson: html => {
 
-        // HTML string? => convert to HTML elements
+        /**
+         * ccm HTML data
+         * @type {Object}
+         */
+        const json = { inner: [] };
+
+        // is HTML string? => convert to document fragment
         if ( typeof html === 'string' ) html = document.createRange().createContextualFragment( html );
 
-        // jQuery element? => convert to HTML elements
+        // is jQuery element? => convert to document fragment
         if ( window.jQuery && html instanceof jQuery ) {
           html = html.get();
           const fragment = document.createDocumentFragment();
-          html.map( elem => fragment.appendChild( elem ) );
+          html.forEach( elem => fragment.appendChild( elem ) );
           html = fragment;
         }
 
-        // HTML element instead of HTML data? => abort (result is given HTML element)
-        if ( self.helper.isNode( html ) ) return html;
+        // is document fragment? => transfer children to an empty on-the-fly <div>
+        if ( html instanceof DocumentFragment ) {
+          const div = document.createElement( 'div' );
+          div.appendChild( html );
+          html = div;
+        }
+
+        // no HTML Element? => abort
+        if ( !self.helper.isElementNode( html ) ) return html;
+
+        // catch tag name
+        json.tag = html.tagName.toLowerCase();
+        if ( json.tag === 'div' ) delete json.tag;
+
+        // catch HTML attributes
+        [ ...html.attributes ].forEach( attr => json[ attr.name ] = attr.value );
+
+        // catch inner HTML (recursive)
+        [ ...html.childNodes ].forEach( child =>
+          json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent )
+        );
+        if ( json.inner.length === 1 ) json.inner = json.inner[ 0 ];
+        if ( !json.inner.length ) delete json.inner;
+
+        return json;
+      },
+
+      /**
+       * transforms HTML to a HTML Element and replaces placeholders (recursive)
+       * @param {string|ccm.types.html|ccm.types.html[]|Node|jQuery} html
+       * @param {...string} [values] - values to replace placeholder
+       * @returns {Element|Element[]} HTML Element
+       */
+      html: function ( html, values ) {
+
+        // convert HTML to ccm HTML data
+        html = self.helper.htmlToJson( html );
 
         // clone HTML data
         html = self.helper.clone( html );
@@ -2308,8 +2351,8 @@
         if ( Array.isArray( html ) ) {
 
           // generate each HTML tag
-          var result = [];
-          for ( var i = 0; i < html.length; i++ )
+          const result = [];
+          for ( let i = 0; i < html.length; i++ )
             result.push( self.helper.html( html[ i ] ) );  // recursive call
           return result;
 
@@ -2322,19 +2365,19 @@
          * HTML tag
          * @type {ccm.types.element}
          */
-        var element = document.createElement( self.helper.htmlEncode( html.tag || 'div' ) );
+        const element = document.createElement( self.helper.htmlEncode( html.tag || 'div' ) );
 
         // remove 'tag' and 'key' property
         delete html.tag; if ( !self.helper.regex( 'json' ).test( html.key ) ) delete html.key;
 
         // iterate over ccm html data properties
-        for ( var key in html ) {
+        for ( const key in html ) {
 
           /**
            * value of ccm html data property
            * @type {string|ccm.types.html|Array}
            */
-          var value = html[ key ];
+          const  value = html[ key ];
 
           // interpret ccm html data property
           switch ( key ) {
@@ -2358,7 +2401,7 @@
             // inner HTML
             case 'inner':
               if ( typeof value === 'string' || typeof value === 'number' ) { element.innerHTML = value; break; }
-              var children = this.html( value );  // recursive call
+              let children = this.html( value );  // recursive call
               if ( !Array.isArray( children ) )
                 children = [ children ];
               for ( var i = 0; i < children.length; i++ )
