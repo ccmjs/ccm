@@ -5,12 +5,12 @@
  * @version latest (22.1.1)
  * @changes
  * version 22.1.1 (17.07.2019):
- * - ccm.helper.htmlToJson removes comment nodes
+ * - ccm.helper.html2json removes comment nodes
  * version 22.1.0 (17.07.2019):
- * - ccm.helper.htmlToJson supports <ccm-template> elements (allows loading of multiple templates from a single HTML file)
+ * - ccm.helper.html2json supports <ccm-template> elements (allows loading of multiple templates from a single HTML file)
  * version 22.0.0 (16.07.2019):
  * - ccm.load loads HTML via HTTP GET request (no more support for HTML import)
- * - added 'ccm.helper.htmlToJson(html):json'
+ * - added 'ccm.helper.html2json(html):json'
  * - loading of HTML with ccm.load always results in ccm HTML data (JSON)
  * - updated ccm.helper.html
  * (for older version changes see ccm-21.2.0.js)
@@ -809,7 +809,7 @@
             if ( typeof data === 'string' ) try { data = self.helper.parse( data ); } catch ( e ) {}
 
             // received data is a HTML string? => transform to ccm HTML data
-            if ( resource.type === 'html' ) data = self.helper.htmlToJson( data );
+            if ( resource.type === 'html' ) data = self.helper.html2json( data );
 
             // add received data to results of ccm.load call and to cache
             results[ i ] = self.helper.protect( data );
@@ -2288,7 +2288,7 @@
        * @param {string|jQuery|DocumentFragment|Element|ccm.types.html} html
        * @returns {ccm.types.html} ccm HTML data
        */
-      htmlToJson: html => {
+      html2json: html => {
 
         /**
          * ccm HTML data
@@ -2332,7 +2332,7 @@
             [ ...html.childNodes ].forEach( ( child, i ) => {
               if ( child.tagName !== 'CCM-TEMPLATE' ) return;
               const key = child.getAttribute( 'key' );
-              result[ key || i ] = child = self.helper.htmlToJson( child );  // recursive call
+              result[ key || i ] = child = self.helper.html2json( child );  // recursive call
               delete child.key; delete child.tag;
               if ( !Array.isArray( child.inner ) )
                 result[ key || i ] = child.inner;
@@ -2361,7 +2361,7 @@
           if ( child.nodeValue )
             child.nodeValue = child.nodeValue.trim();
           if ( self.helper.isElementNode( child ) || child.nodeValue )
-            json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent );
+            json.inner.push( self.helper.isElementNode( child ) ? self.helper.html2json( child ) : child.textContent );
         } );
         if ( !json.inner.length )
           delete json.inner;
@@ -2380,7 +2380,7 @@
       html: function ( html, values ) {
 
         // convert HTML to ccm HTML data
-        html = self.helper.htmlToJson( html );
+        html = self.helper.html2json( html );
 
         // clone HTML data
         html = self.helper.clone( html );

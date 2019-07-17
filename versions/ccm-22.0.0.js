@@ -6,7 +6,7 @@
  * @changes
  * version 22.0.0 (16.07.2019):
  * - ccm.load loads HTML via HTTP GET request (no more support for HTML import)
- * - added 'ccm.helper.htmlToJson(html):json'
+ * - added 'ccm.helper.html2json(html):json'
  * - loading of HTML with ccm.load always results in ccm HTML data (JSON)
  * - updated ccm.helper.html
  * (for older version changes see ccm-21.2.0.js)
@@ -805,7 +805,7 @@
             if ( typeof data === 'string' ) try { data = self.helper.parse( data ); } catch ( e ) {}
 
             // received data is a HTML string? => transform to ccm HTML data
-            if ( resource.type === 'html' ) data = self.helper.htmlToJson( data );
+            if ( resource.type === 'html' ) data = self.helper.html2json( data );
 
             // add received data to results of ccm.load call and to cache
             results[ i ] = self.helper.protect( data );
@@ -2284,7 +2284,7 @@
        * @param {string|jQuery|DocumentFragment|Element} html
        * @returns {Object} ccm HTML data
        */
-      htmlToJson: html => {
+      html2json: html => {
 
         /**
          * ccm HTML data
@@ -2343,7 +2343,7 @@
           if ( child.nodeValue )
             child.nodeValue = child.nodeValue.trim();
           if ( self.helper.isElementNode( child ) || child.nodeValue )
-            json.inner.push( self.helper.isElementNode( child ) ? self.helper.htmlToJson( child ) : child.textContent );
+            json.inner.push( self.helper.isElementNode( child ) ? self.helper.html2json( child ) : child.textContent );
         } );
         if ( !json.inner.length )
           delete json.inner;
@@ -2362,7 +2362,7 @@
       html: function ( html, values ) {
 
         // convert HTML to ccm HTML data
-        html = self.helper.htmlToJson( html );
+        html = self.helper.html2json( html );
 
         // clone HTML data
         html = self.helper.clone( html );
