@@ -5,7 +5,7 @@
  * @version latest (22.1.0)
  * @changes
  * version 22.1.0 (17.07.2019):
- * - ccm.helper.htmlToJson supports <html-template> elements (allows loading of multiple templates from a single HTML file)
+ * - ccm.helper.htmlToJson supports <ccm-template> elements (allows loading of multiple templates from a single HTML file)
  * version 22.0.0 (16.07.2019):
  * - ccm.load loads HTML via HTTP GET request (no more support for HTML import)
  * - added 'ccm.helper.htmlToJson(html):json'
@@ -2325,10 +2325,10 @@
           } );
 
           // contains many HTML templates? => convert to object (each property contains a HTML template)
-          if ( html.firstChild.tagName === 'HTML-TEMPLATE' ) {
+          if ( html.firstChild.tagName === 'CCM-TEMPLATE' ) {
             const result = html.firstChild.getAttribute( 'key' ) ? {} : [];
             [ ...html.childNodes ].forEach( ( child, i ) => {
-              if ( child.tagName !== 'HTML-TEMPLATE' ) return;
+              if ( child.tagName !== 'CCM-TEMPLATE' ) return;
               const key = child.getAttribute( 'key' );
               result[ key || i ] = child = self.helper.htmlToJson( child );  // recursive call
               delete child.key; delete child.tag;
