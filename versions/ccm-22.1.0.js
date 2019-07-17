@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.1.0)
+ * @version 22.1.0
  * @changes
  * version 22.1.0 (17.07.2019):
  * - ccm.helper.htmlToJson supports <html-template> elements (allows loading of multiple templates from a single HTML file)
