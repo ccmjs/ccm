@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.2.1)
+ * @version 22.2.1
  * @changes
  * version 22.2.1 (24.07.2019):
  * - bug fix for ccm.helper.html2json
