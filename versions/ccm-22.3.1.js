@@ -2330,7 +2330,7 @@
           // remove whitespaces, comments and empty text nodes
           [ ...html.childNodes ].forEach( child => {
             if ( child.nodeValue ) {
-              child.nodeValue = child.nodeValue.replace( /\s+/g, ' ' );
+              child.nodeValue = child.nodeValue.trim();
               if ( !child.nodeValue || child.nodeType === child.COMMENT_NODE ) self.helper.removeElement( child );
             }
           } );
