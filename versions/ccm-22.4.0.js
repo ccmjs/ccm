@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.4.0)
+ * @version 22.4.0
  * @changes
  * version 22.4.0 (28.07.2019):
  * - define of Custom Element <ccm-app>
