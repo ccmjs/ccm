@@ -2369,7 +2369,7 @@
         [ ...html.childNodes ].forEach( child => {
           if ( child.nodeValue )
             child.nodeValue = child.nodeValue.replace( /\s+/g, ' ' );
-          if ( self.helper.isElementNode( child ) || child.nodeValue )
+          if ( self.helper.isElementNode( child ) || child.nodeValue.trim() )
             json.inner.push( self.helper.isElementNode( child ) ? self.helper.html2json( child ) : child.textContent );
         } );
         if ( !json.inner.length )
