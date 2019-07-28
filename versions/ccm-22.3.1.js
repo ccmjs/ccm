@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.3.1)
+ * @version 22.3.1
  * @changes
  * version 22.3.1 (28.07.2019):
  * - bug fix for replacement of whitespaces in ccm.helper.html2json
