@@ -3482,7 +3482,8 @@
         this.removeAttribute( 'key' );
         config.root = this;
         const split = name.split( '-' );
-        const index = split.shift() + split.join( '.' );
+        if ( split.length > 1 ) name = split.shift() + '-' + split.join( '.' );
+        await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : name, config );
         await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : index, config );
       }
     } );
