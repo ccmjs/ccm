@@ -949,7 +949,7 @@
         component.ready && await component.ready.call( component ); delete component.ready;
 
         // define HTML tag for component
-        await defineCustomElement( 'ccm-' + component.index );
+        await defineCustomElement( component.index );
 
       }
 
@@ -3451,11 +3451,11 @@
   if ( !ccm.version || self.helper.compareVersions( self.version(), ccm.version() ) > 0 ) { ccm.latest = self; Object.assign( ccm, self.helper.clone( self ) ); }
 
   // define Custom Element <ccm-app>
-  defineCustomElement( 'ccm-app' );
+  defineCustomElement( 'app' );
 
   /**
    * defines a ccm-specific Custom Element
-   * @param {string} name - element name
+   * @param {string} name - element name (without 'ccm-' prefix)
    * @returns {Promise<void>}
    */
   async function defineCustomElement( name ) {
@@ -3469,8 +3469,8 @@
       }
     } );
 
-    if ( customElements.get( name ) ) return;
-    window.customElements.define( name, class extends HTMLElement {
+    if ( customElements.get( 'ccm-' + name ) ) return;
+    window.customElements.define( 'ccm-' + name, class extends HTMLElement {
       async connectedCallback() {
         if ( !document.body.contains( this ) ) return;
         let node = this;
