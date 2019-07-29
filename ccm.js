@@ -3481,7 +3481,9 @@
         const config = self.helper.generateConfig( this );
         this.removeAttribute( 'key' );
         config.root = this;
-        await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : name, config );
+        const split = name.split( '-' );
+        const index = split.shift() + split.join( '.' );
+        await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : index, config );
       }
     } );
 
