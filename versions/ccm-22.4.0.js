@@ -949,7 +949,7 @@
         component.ready && await component.ready.call( component ); delete component.ready;
 
         // define HTML tag for component
-        await defineCustomElement( 'ccm-' + component.index );
+        await defineCustomElement( 'ccm-' + component.index, component );
 
       }
 
@@ -3456,9 +3456,10 @@
   /**
    * defines a ccm-specific Custom Element
    * @param {string} name - element name
+   * @param {Object} [component] - component object
    * @returns {Promise<void>}
    */
-  async function defineCustomElement( name ) {
+  async function defineCustomElement( name, component ) {
 
     // load polyfill for Custom Elements
     if ( !( 'customElements' in window ) ) await self.load( {
