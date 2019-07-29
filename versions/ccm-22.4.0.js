@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version 22.4.0
+ * @version latest (22.4.0)
  * @changes
  * version 22.4.0 (28.07.2019):
  * - define of Custom Element <ccm-app>
@@ -949,7 +949,7 @@
         component.ready && await component.ready.call( component ); delete component.ready;
 
         // define HTML tag for component
-        await defineCustomElement( 'ccm-' + component.index, component );
+        await defineCustomElement( 'ccm-' + component.index );
 
       }
 
@@ -3456,10 +3456,9 @@
   /**
    * defines a ccm-specific Custom Element
    * @param {string} name - element name
-   * @param {Object} [component] - component object
    * @returns {Promise<void>}
    */
-  async function defineCustomElement( name, component ) {
+  async function defineCustomElement( name ) {
 
     // load polyfill for Custom Elements
     if ( !( 'customElements' in window ) ) await self.load( {
@@ -3482,10 +3481,7 @@
         const config = self.helper.generateConfig( this );
         this.removeAttribute( 'key' );
         config.root = this;
-        if ( this.tagName === 'CCM-APP' )
-          await ccm.start( this.getAttribute( 'component' ), config );
-        else
-          await component.start( config );
+        await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : name, config );
       }
     } );
 
