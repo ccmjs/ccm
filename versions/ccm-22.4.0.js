@@ -3483,7 +3483,7 @@
         config.root = this;
         const split = name.split( '-' );
         if ( split.length > 1 ) name = split.shift() + '-' + split.join( '.' );
-        await ccm.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : name, config );
+        await self.start( this.tagName === 'CCM-APP' ? this.getAttribute( 'component' ) : name, config );
       }
     } );
 
