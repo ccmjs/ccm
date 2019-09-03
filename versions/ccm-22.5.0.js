@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.5.0)
+ * @version 22.5.0
  * @changes
  * version 22.5.0 (03.09.2019):
  * - ccm.helper.generateConfig accepts many forms of HTML
