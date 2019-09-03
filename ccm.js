@@ -2365,6 +2365,13 @@
        */
       html: function ( html, values, settings ) {
 
+        // handle advanced settings
+        let advanced = {};
+        if ( self.helper.isObject( settings ) ) {
+          advanced = settings;
+          settings = undefined;
+        }
+
         // convert HTML to ccm HTML data
         html = self.helper.html2json( html );
 
@@ -2372,7 +2379,7 @@
         html = self.helper.clone( html );
 
         // replace placeholder
-        if ( arguments.length > 1 && !self.helper.isObject( settings ) ) html = self.helper.format.apply( this, arguments );
+        if ( values !== undefined ) html = self.helper.format.apply( this, arguments );
 
         // get more than one HTML tag?
         if ( Array.isArray( html ) ) {
@@ -2431,7 +2438,7 @@
               let children = this.html( value, undefined, settings );  // recursive call
               if ( !Array.isArray( children ) )
                 children = [ children ];
-              for ( var i = 0; i < children.length; i++ )
+              for ( let i = 0; i < children.length; i++ )
                 if ( self.helper.isNode( children[ i ] ) )
                   element.appendChild( children[ i ] );
                 else
@@ -2449,7 +2456,7 @@
         }
 
         // is ccm HTML Element of registered component and evaluation is not skipped? => evaluate ccm HTML Element
-        if ( element.tagName.startsWith( 'CCM-' ) && !( self.helper.isObject( settings ) && settings.no_evaluation ) ) {
+        if ( element.tagName.startsWith( 'CCM-' ) && !advanced.no_evaluation ) {
           const config = self.helper.generateConfig( element );
           config.root = element;
           self.start( element.tagName === 'CCM-APP' ? element.getAttribute( 'component' ) : element.tagName.substr( 4 ).toLowerCase(), config );
