@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.6.1)
+ * @version 22.6.1
  * @changes
  * version 22.6.1 (16.09.2019):
  * - bug fix for register component with not existing index
