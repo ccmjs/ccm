@@ -2,10 +2,11 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.6.2)
+ * @version 22.6.2
  * @changes
  * version 22.6.2 (24.09.2019):
  * - bug fix for generate a config out of a HTML Element
+ * - check if loaded data is a JSON string before try to parse it
  * version 22.6.1 (16.09.2019):
  * - bug fix for register component with not existing index
  * version 22.6.0 (13.09.2019):
@@ -829,7 +830,7 @@
             if ( checkTimeout() ) return;
 
             // received data is a JSON string? => parse it to JSON
-            if ( typeof data === 'string' ) try { data = self.helper.parse( data ); } catch ( e ) {}
+            if ( typeof data === 'string' && self.helper.regex( 'json' ).test( data ) ) try { data = self.helper.parse( data ); } catch ( e ) {}
 
             // received data is a HTML string? => transform to ccm HTML data
             if ( resource.type === 'html' ) data = self.helper.html2json( data );
