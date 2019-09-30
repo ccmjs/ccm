@@ -2279,7 +2279,7 @@
        * @param {ccm.types.instance} instance
        * @returns {boolean}
        */
-      hasDomContact: instance => self.helper.hasParentContact( instance ) && document.contains( self.context.root( instance ).root ),
+      hasDomContact: instance => document.contains( self.context.root( instance ).root && ( self.helper.hasParentContact( instance ) || !instance.parent ) ),
 
       /**
        * checks if an instance has parent element contact
