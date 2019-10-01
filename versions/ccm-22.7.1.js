@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.7.1)
+ * @version 22.7.1
  * @changes
  * version 22.7.1 (01.10.2019):
  * - bug fix in ccm.helper.html for correct recursive call with advanced settings
