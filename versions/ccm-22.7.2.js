@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (22.7.2)
+ * @version 22.7.2
  * @changes
  * version 22.7.2 (03.10.2019):
  * - no render of loading icon when instance has no start method
