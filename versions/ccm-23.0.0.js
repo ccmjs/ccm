@@ -1107,10 +1107,10 @@
           let shadow;
 
           // handle Shadow DOM
-          if ( !instance.shadow ) instance.shadow = 'closed';
-          if ( typeof instance.shadow === 'string' && instance.shadow !== 'none' ) {
-            shadow = root.shadowRoot || root.attachShadow( { mode: instance.shadow } );
-            delete instance.shadow;
+          if ( !config.shadow ) config.shadow = 'closed';
+          if ( typeof config.shadow === 'string' && config.shadow !== 'none' ) {
+            shadow = root.shadowRoot || root.attachShadow( { mode: config.shadow } );
+            delete config.shadow;
           }
 
           // set content element
