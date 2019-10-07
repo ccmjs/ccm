@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (23.0.1)
+ * @version 23.0.1
  * @changes
  * version 23.0.1 (07.10.2019):
  * - bug fix for handle of double quotes
