@@ -4,7 +4,7 @@
  * @license The MIT License (MIT)
  * @version latest (23.0.1)
  * @changes
- * version 23.0.1 (07.10.2019):
+ * version 23.0.1 (08.10.2019):
  * - bug fix for handle of double quotes
  * version 23.0.0 (06.10.2019):
  * - set Shadow DOM mode via config: 'open', 'closed' or 'none'
@@ -2051,7 +2051,7 @@
               if ( self.helper.regex( 'json' ).test( data[ name ] ) )
                 data[ name ] = self.helper.decodeObject( data[ name ] );
               else
-                data[ name ] = data[ name ].replace( /"/g, '\\"' );
+                data[ name ] = data[ name ];
           } catch ( err ) {}
         } );
         return self.helper.protect( self.helper.solveDotNotation( data ) );
