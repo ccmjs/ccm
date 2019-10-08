@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.0.0)
+ * @version 24.0.0
  * @changes
  * version 24.0.0 (08.10.2019): updated ccm.helper.integrate
  * - changed to asynchronous function
