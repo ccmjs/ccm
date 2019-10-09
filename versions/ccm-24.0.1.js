@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.0.1)
+ * @version 24.0.1
  * @changes
  * version 24.0.1 (09.10.2019):
  * - prevent load of CSS in same context twice
