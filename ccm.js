@@ -1960,6 +1960,9 @@
                   values[ i ][ key ] = `%$2%${key}%`;                        // replace value with special placeholder
                 }
 
+                // value is not a string? => skip replacement
+                if ( typeof values[ i ][ key ] !== 'string' ) continue;
+
                 // replace all associated placeholders with value
                 data = data.replace( new RegExp( `%${key}%`, 'g' ), values[ i ][ key ].replace( /"/g, '\\"' ) );
 
