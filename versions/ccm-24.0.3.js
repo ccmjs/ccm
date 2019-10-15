@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.0.3)
+ * @version 24.0.3
  * @changes
  * version 24.0.3 (15.10.2019):
  * - bug fix for interpret <ccm-app> with ccm.helper.html
