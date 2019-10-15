@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.0.2)
+ * @version 24.0.2
  * @changes
  * version 24.0.2 (15.10.2019):
  * - bug fix for load JS without cache
