@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.0.5)
+ * @version 24.0.5
  * @changes
  * version 24.0.5 (27.10.2019):
  * - bug fix for creating a local ccm datastore with initial data by versioned URL
