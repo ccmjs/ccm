@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.1.0)
+ * @version 24.1.0
  * @changes
  * version 24.1.0 (13.11.2019):
  * - script tags are only filtered at DOM manipulation
