@@ -2398,14 +2398,17 @@
       },
 
       /**
-       * transforms HTML to a HTML Element and replaces placeholders (recursive)
+       * transforms HTML to a HTML element and replaces placeholders (recursive)
        * @param {string|ccm.types.html|ccm.types.html[]|Node|jQuery} html
        * @param {...string|Object} [values] - values to replace placeholder
        * @param {Object} [settings] - advanced settings
-       * @param {boolean} [settings.no_evaluation] - skips evaluation of ccm HTML Elements
-       * @returns {Element|Element[]} HTML Element
+       * @param {boolean} [settings.no_evaluation] - skips evaluation of ccm HTML elements
+       * @returns {Element|Element[]} HTML element
        */
       html: function ( html, values, settings ) {
+
+        // is already a HTML element? => this is the result (without replaced placeholders)
+        if ( self.helper.isElementNode( html ) ) return html;
 
         // handle advanced settings
         let advanced = {};
