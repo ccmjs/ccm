@@ -2407,8 +2407,8 @@
        */
       html: function ( html, values, settings ) {
 
-        // is already a HTML element? => this is the result (without replaced placeholders)
-        if ( self.helper.isElementNode( html ) ) return html;
+        // is already a HTML element and no placeholders have to be replaced? => nothing to do
+        if ( self.helper.isElementNode( html ) && values === undefined ) return html;
 
         // handle advanced settings
         let advanced = {};
