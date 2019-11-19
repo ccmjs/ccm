@@ -5,7 +5,8 @@
  * @version 24.1.1
  * @changes
  * version 24.1.1 (19.11.2019):
- * - bug fix for ccm.helper.fillForm: no manipulation of original passed data
+ * - bug fix in ccm.helper.fillForm: no manipulation of original passed data
+ * - bug fix in ccm.helper.html: no lost of events when appending child nodes by HTML string
  * version 24.1.0 (13.11.2019):
  * - script tags are only filtered at DOM manipulation
  * - ccm.helper.append, ccm.helper.prepend and ccm.helper.setContent allow append of multiple content
@@ -2484,13 +2485,8 @@
             case 'inner':
               if ( typeof value === 'string' || typeof value === 'number' ) { element.innerHTML = value; break; }
               let children = this.html( value, undefined, advanced );  // recursive call
-              if ( !Array.isArray( children ) )
-                children = [ children ];
-              for ( let i = 0; i < children.length; i++ )
-                if ( self.helper.isNode( children[ i ] ) )
-                  element.appendChild( children[ i ] );
-                else
-                  element.innerHTML += children[ i ];
+              if ( !Array.isArray( children ) ) children = [ children ];
+              children.forEach( child => self.helper.append( element, child ) );
               break;
 
             // HTML value attributes and events
