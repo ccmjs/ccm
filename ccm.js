@@ -5,7 +5,7 @@
  * @version latest (24.1.1)
  * @changes
  * version 24.1.1 (19.11.2019):
- * - bug fix for ccm.helper.toDotNotation: no manipulation of original passed data
+ * - bug fix for ccm.helper.fillForm: no manipulation of original passed data
  * version 24.1.0 (13.11.2019):
  * - script tags are only filtered at DOM manipulation
  * - ccm.helper.append, ccm.helper.prepend and ccm.helper.setContent allow append of multiple content
