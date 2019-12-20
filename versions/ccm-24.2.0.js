@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2019
  * @license The MIT License (MIT)
- * @version latest (24.2.0)
+ * @version 24.2.0
  * @changes
  * version 24.2.0 (20.12.2019):
  * - bug fix for throw exception
