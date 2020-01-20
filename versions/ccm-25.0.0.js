@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (25.0.0)
+ * @version 25.0.0
  * @changes
  * version 25.0.0 (20.01.2020)
  * - moved not framework-relevant helper functions to extern ES6 module
