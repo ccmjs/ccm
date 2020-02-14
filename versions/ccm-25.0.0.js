@@ -14,6 +14,7 @@
  * - bug fix for throw exception on invalid component filename in ccm.helper.convertComponentURL
  * - bug fix for ignore of comments in HTML templates
  * - ccm.helper.html can process SVG tags inside of ccm HTML data
+ * - correct detection of HTML boolean attributes
  * (for older version changes see ccm-24.2.0.js)
  */
 
@@ -1864,7 +1865,7 @@
           if ( value === 'false'     ) return false;
           if ( value === 'null'      ) return null;
           if ( value === 'undefined' ) return undefined;
-          if ( value === ''          ) return '';
+          if ( value === ''          ) return true;
           if ( !isNaN( value )       ) return parseInt( value );
           return value;
         }
