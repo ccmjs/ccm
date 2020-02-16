@@ -16,6 +16,7 @@
  * - ccm.helper.html can process SVG tags inside of ccm HTML data
  * - correct detection of HTML boolean attributes
  * - bug fix for solving dependencies when linked config no more exists
+ * - bug fix for ccm.helper.toDotNotation on special objects
  * (for older version changes see ccm-24.2.0.js)
  */
 
@@ -2586,7 +2587,7 @@
         function recursive( obj, prefix ) {
 
           for ( const key in obj ) {
-            if ( typeof obj[ key ] === 'object' ) {
+            if ( typeof obj[ key ] === 'object' && !self.html.isSpecialObject( obj[ key ] ) ) {
               if ( all_levels ) result[ prefix + key ] = obj[ key ];
               recursive( obj[ key ], prefix + key + '.' );
             }
