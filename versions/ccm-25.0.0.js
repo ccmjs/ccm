@@ -2587,7 +2587,7 @@
         function recursive( obj, prefix ) {
 
           for ( const key in obj ) {
-            if ( typeof obj[ key ] === 'object' && !self.html.isSpecialObject( obj[ key ] ) ) {
+            if ( typeof obj[ key ] === 'object' && !self.helper.isSpecialObject( obj[ key ] ) ) {
               if ( all_levels ) result[ prefix + key ] = obj[ key ];
               recursive( obj[ key ], prefix + key + '.' );
             }
