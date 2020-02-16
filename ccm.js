@@ -15,6 +15,7 @@
  * - bug fix for ignore of comments in HTML templates
  * - ccm.helper.html can process SVG tags inside of ccm HTML data
  * - correct detection of HTML boolean attributes
+ * - bug fix for solving dependencies when linked config no more exists
  * (for older version changes see ccm-24.2.0.js)
  */
 
@@ -2515,8 +2516,8 @@
           case 'start':
           case 'set':
           case 'del':
-            if ( !dependency[ operation === 'store' ? 0 : 1 ] ) dependency[ operation === 'store' ? 0 : 1 ] = {};
             dependency[ 1 ] = await self.helper.solveDependency( dependency[ 1 ], instance );
+            if ( !dependency[ operation === 'store' ? 0 : 1 ] ) dependency[ operation === 'store' ? 0 : 1 ] = {};
             if ( instance ) dependency[ operation === 'store' ? 0 : 1 ].parent = instance;
             return await self[ operation ].apply( null, dependency );
           case 'store':
