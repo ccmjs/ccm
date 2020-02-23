@@ -17,6 +17,7 @@
  * - correct detection of HTML boolean attributes
  * - bug fix for solving dependencies when linked config no more exists
  * - bug fix for ccm.helper.toDotNotation on special objects
+ * - bug fix for ccm.get dependencies with a string as store settings
  * (for older version changes see ccm-24.2.0.js)
  */
 
@@ -2523,7 +2524,7 @@
             return await self[ operation ].apply( null, dependency );
           case 'store':
           case 'get':
-            if ( !dependency[ 0 ] ) dependency[ 0 ] = {};
+            if ( !dependency[ 0 ] || !self.helper.isObject( dependency[ 0 ] ) ) dependency[ 0 ] = { local: dependency[ 0 ] };
             if ( instance ) dependency[ 0 ].parent = instance;
             return await self[ operation ].apply( null, dependency );
         }
