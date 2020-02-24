@@ -2525,7 +2525,6 @@
           case 'store':
           case 'get':
             if ( !dependency[ 0 ] ) dependency[ 0 ] = {};
-//            if ( !dependency[ 0 ] || !self.helper.isObject( dependency[ 0 ] ) ) dependency[ 0 ] = { local: dependency[ 0 ] };
             if ( instance ) dependency[ 0 ].parent = instance;
             return await self[ operation ].apply( null, dependency );
         }
