@@ -399,7 +399,7 @@
     function useWebsocket( params ) { return new Promise( resolve => {
 
       const key = self.helper.generateKey();
-      callbacks[ key ] = result => Number.isInteger( result ) ? checkError( result ) : resolve;
+      callbacks[ key ] = result => Number.isInteger( result ) ? checkError : resolve;
       params.callback = key;
       that.socket.send( self.helper.stringify( params ) );
 
