@@ -18,6 +18,7 @@
  * - bug fix for solving dependencies when linked config no more exists
  * - bug fix for ccm.helper.toDotNotation on special objects
  * - bug fix for ccm.get dependencies with a string as store settings
+ * - bug fix for reacting on invalid token on websocket connection
  * (for older version changes see ccm-24.2.0.js)
  */
 
@@ -376,7 +377,7 @@
     async function checkError( error, reject ) {
 
       // token has expired? => user must login again and app restarts
-      if ( error && error.data && error.data.status === 401 && user ) {
+      if ( error && ( error === 401 || error.data && error.data.status === 401 ) && user ) {
         try {
           await user.logout();
           await user.login();
@@ -398,7 +399,7 @@
     function useWebsocket( params ) { return new Promise( resolve => {
 
       const key = self.helper.generateKey();
-      callbacks[ key ] = resolve;
+      callbacks[ key ] = result => Number.isInteger( result ) ? checkError( result ) : resolve;
       params.callback = key;
       that.socket.send( self.helper.stringify( params ) );
 
