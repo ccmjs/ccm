@@ -1962,7 +1962,7 @@
         if ( json.tag === 'div' ) delete json.tag;
 
         // catch HTML attributes
-        html.attributes && [ ...html.attributes ].forEach( attr => json[ attr.name ] = attr.value === '' ? true : attr.value );
+        html.attributes && [ ...html.attributes ].forEach( attr => json[ attr.name ] = attr.value === '' && attr.name !== 'value' ? true : attr.value );
 
         // catch inner HTML (recursive)
         [ ...html.childNodes ].forEach( child => {
