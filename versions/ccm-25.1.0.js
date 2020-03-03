@@ -363,7 +363,7 @@
       }
 
       function serverDB() {
-        ( that.socket ? useWebsocket : useHttp )( prepareParams( query ? { count: query } : {} ) ).then( response => ( !isNaN( response ) ? resolve : reject )( response ) ).catch( error => checkError( error, reject ) );
+        ( that.socket ? useWebsocket : useHttp )( prepareParams( query ? { count: query } : {} ) ).then( response => ( !isNaN( response ) ? resolve( parseInt( response ) ) : reject( response ) ) ).catch( error => checkError( error, reject ) );
       }
 
     } );
