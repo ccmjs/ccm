@@ -1010,17 +1010,17 @@
      */
     instance: async ( component, config ) => {
 
-      // prepare ccm instance configuration
-      config = await prepareConfig( config, component.config );
-
       // get object of ccm component
       component = await self.component( component, { ccm: config && config.ccm } ); config && delete config.ccm;
 
-      // no component object? => abort
-      if ( !self.helper.isComponent( component ) ) return component;
+      // prepare ccm instance configuration
+      config = await prepareConfig( config, component.config );
 
       // perform 'beforeCreation' callback
       config.beforeCreation && await config.beforeCreation( config, self.helper.clone( component ) ); delete config.beforeCreation;
+
+      // no component object? => abort
+      if ( !self.helper.isComponent( component ) ) return component;
 
       // component uses other framework version? => create instance via other framework version (and considers backward compatibility)
       if ( component.ccm.version() !== self.version() ) return new Promise( async resolve => {
