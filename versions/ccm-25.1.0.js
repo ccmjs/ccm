@@ -2723,11 +2723,11 @@
   async function changeFrameworkVersion( component, config ) {
 
     // should use other ccm framework version? => change used framework version in component object
-    const source = config && config.ccm;
+    const source = ( config && config.ccm ) || ( component.config && component.config.ccm );
     if ( source ) {
       component.ccm = ccm[ ( await self.helper.loadFramework( source ) ).version() ];
       component.ccm.url = self.helper.isObject( source ) ? source.url : source;        // (considers backward compatibility)
-      config && delete config.ccm;
+      config && delete config.ccm; component.config && delete component.config.ccm
     }
 
   }
