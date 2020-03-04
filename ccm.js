@@ -1038,14 +1038,14 @@
      */
     instance: async ( component, config ) => {
 
-      // get object of ccm component
-      component = await self.component( component, { ccm: config && config.ccm } ); config && delete config.ccm;
-
       // prepare ccm instance configuration
       config = await prepareConfig( config, component.config );
 
       // perform 'beforeCreation' callback
       config.beforeCreation && await config.beforeCreation( config, self.helper.clone( component ) ); delete config.beforeCreation;
+
+      // get object of ccm component
+      component = await self.component( component, { ccm: config && config.ccm } ); config && delete config.ccm;
 
       // no component object? => abort
       if ( !self.helper.isComponent( component ) ) return component;
