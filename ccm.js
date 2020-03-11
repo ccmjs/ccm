@@ -493,6 +493,11 @@
 
     /**
      * @summary loading of resources
+     * @description
+     * This method provides a service for asynchronous loading of resources. You can load resources like HTML, CSS,
+     * Images, JavaScript, Modules, JSON and XML data on-demand and cross-domain. On a single call several resources
+     * can be loaded at once. It can be flexibly controlled which resources are loaded in serial and which in parallel.
+     * See the wiki page on GitHub for more details about this method. There are also many examples how to use it.
      * @memberOf ccm
      * @see https://github.com/ccmjs/ccm/wiki/Loading-of-Resources
      * @param {...ccm.types.resource} resources - resources data
