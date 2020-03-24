@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (25.2.0)
+ * @version 25.2.0
  * @changes
  * version 25.2.0 (25.03.2020)
  * - added element queries via observed responsive breakpoints (original implemented for ccm from Stefan Lorse)
