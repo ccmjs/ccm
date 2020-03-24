@@ -484,7 +484,7 @@
      * @memberOf ccm
      * @returns {ccm.types.version}
      */
-    version: () => '25.1.0',
+    version: () => '25.2.0',
 
     /**
      * @summary global namespaces for registered ccm components
