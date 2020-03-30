@@ -1947,13 +1947,13 @@
 
         // is HTML string? => convert to document fragment
         if ( typeof html === 'string' ) {
-          const templates = html.match( /(?<=<ccm-template.*?>)([^]*?)(?=<\/ccm-template>)/g );
-          if ( templates ) {
-            const keys = html.match( /(?<=<ccm-template key=")(\S*)(?=">[^]*?<\/ccm-template>)/g );
-            const result = keys ? {} : [];
-            templates.forEach( ( template, i ) => result[ keys[ i ] || i ] = self.helper.html2json( template ) );
-            return result;
-          }
+
+          const regex = /<ccm-template key="(\w*?)">([^]*?)<\/ccm-template>/g;
+          const result = {}; let array;
+          while ( array = regex.exec( html ) )
+            result[ array[ 1 ] ] = self.helper.html2json( array[ 2 ] );
+          if ( Object.keys( result ).length ) return result;
+
           const template = document.createElement( 'template' );
           template.innerHTML = html;
           html = template.content;
