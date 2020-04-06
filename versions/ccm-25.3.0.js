@@ -2435,7 +2435,7 @@
       loading: instance => {
 
         // set keyframe for ccm loading icon animation
-        let element = instance ? instance.shadow : document.head;
+        let element = instance ? instance.element.parentNode : document.head;
         if ( !element.querySelector( '#ccm_keyframe' ) ) {
           const style = document.createElement( 'style' );
           style.id = 'ccm_keyframe';
