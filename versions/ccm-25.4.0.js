@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version 25.4.0
+ * @version latest (25.4.0)
  * @changes
  * version 25.4.0 (07.04.2020)
  * - added optional callback for responsive breakpoints (config.onbreakpoint)
@@ -1177,7 +1177,7 @@
           ( instance.shadow || root ).appendChild( instance.element = self.helper.html( { id: 'element' } ) );
 
           // set observed responsive breakpoints for content element
-          config.breakpoints !== false && self.helper.responsive( instance.element, config.breakpoints, config.onbreakpoint );
+          config.breakpoints !== false && self.helper.responsive( instance.element, config.breakpoints, instance );
 
           if ( !instance.root ) instance.root = root;
 
@@ -2526,9 +2526,9 @@
        * @summary sets observed responsive breakpoints for an element
        * @param {Element} element
        * @param {Object} [breakpoints = { SM: 384, MD: 576, LG: 768, XL: 960 }]
-       * @param {Function} [onbreakpoint] - callback when breakpoint changes
+       * @param {Object} [instance] - ccm instance with an 'onbreakpoint' callback
        */
-      responsive: ( element, breakpoints = { SM: 384, MD: 576, LG: 768, XL: 960 }, onbreakpoint ) => {
+      responsive: ( element, breakpoints = { SM: 384, MD: 576, LG: 768, XL: 960 }, instance ) => {
 
         let init = true;
         if ( window.ResizeObserver )
@@ -2546,7 +2546,7 @@
           for ( const key in breakpoints )
             element.classList[ element.offsetWidth >= breakpoints[ key ] ? 'add' : 'remove' ]( key );
           const after = element.getAttribute( 'class' );
-          !init && before !== after && onbreakpoint && onbreakpoint( breakpoints[ after.split( ' ' ).pop() ] || 0 );
+          !init && before !== after && instance.onbreakpoint && instance.onbreakpoint( breakpoints[ after.split( ' ' ).pop() ] || 0 );
           init = false;
         }
 
