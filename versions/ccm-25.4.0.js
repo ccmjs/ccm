@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (25.4.0)
+ * @version 25.4.0
  * @changes
  * version 25.4.0 (07.04.2020)
  * - added optional callback for responsive breakpoints (config.onbreakpoint)
