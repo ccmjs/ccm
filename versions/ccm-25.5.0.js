@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (25.5.0)
+ * @version 25.5.0
  * @changes
  * version 25.5.0 (21.04.2020)
  * - 'async store.set(priodata):key' allows a query for priodata.key
