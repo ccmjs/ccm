@@ -2,7 +2,7 @@
  * @overview ccm framework
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (25.5.1)
+ * @version 25.5.1
  * @changes
  * version 25.5.1 (29.04.2020)
  * - bug fix for ccm.helper.html for boolean as content
