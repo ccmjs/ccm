@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2020
  * @license The MIT License (MIT)
- * @version latest (26.0.0)
+ * @version 26.0.0
  * @changes
  * version 26.0.0 (04.10.2020)
  * - removed unneeded namespace ccm.latest
