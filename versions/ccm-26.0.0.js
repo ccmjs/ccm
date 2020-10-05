@@ -18,6 +18,7 @@
  * - added loading of xml regardless of the file extension
  * - loading a subset of exported module members
  * - ccm.helper.html() accepts functions that return a TemplateResult from lit-html
+ * - bug fix for ccm.helper.html() when last parameter is HTML data
  * - each instance knows her children instances at <code>instance.children</code>
  * - code refactoring
  * - updated doc comments
@@ -2060,7 +2061,8 @@
 
         // handle advanced settings
         let advanced = {};
-        if ( ccm.helper.isObject( values[ values.length - 1 ] ) )
+        const last = values[ values.length - 1 ];
+        if ( ccm.helper.isObject( last ) && !last.tag && !last.inner )
           advanced = values.pop();
 
         // convert HTML to ccm HTML data
