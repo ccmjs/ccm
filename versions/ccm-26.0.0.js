@@ -1155,7 +1155,7 @@
       }
 
       // convert Light DOM to Element Node
-      config.inner = ccm.helper.html( config.inner, undefined, { no_evaluation: true } );
+      config.inner = ccm.helper.html( config.inner, { no_evaluation: true } );
 
       // integrate config in created ccm instance
       Object.assign( instance, config );
@@ -1892,7 +1892,7 @@
       generateConfig: element => {
 
         // convert to HTML element
-        element = ccm.helper.html( element, undefined, { no_evaluation: true } );
+        element = ccm.helper.html( element, { no_evaluation: true } );
 
         // innerHTML is a JSON string? => move it to attribture 'inner'
         if ( ccm.helper.regex( 'json' ).test( element.innerHTML ) ) { element.setAttribute( 'inner', element.innerHTML ); element.innerHTML = ''; }
@@ -2135,7 +2135,7 @@
             case 'inner':
               if ( typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ) { element.innerHTML = value; break; }
               let children = Array.isArray( value ) ? value : [ value ];
-              children.forEach( child => element.appendChild( this.html( child, undefined, advanced ) ) );
+              children.forEach( child => element.appendChild( this.html( child, advanced ) ) );
               break;
 
             // HTML value attributes and events
