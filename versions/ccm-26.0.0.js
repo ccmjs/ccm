@@ -1892,7 +1892,7 @@
       generateConfig: element => {
 
         // convert to HTML element
-        element = ccm.helper.html( element, { no_evaluation: true } );
+        element = ccm.helper.html( element, undefined, { no_evaluation: true } );
 
         // innerHTML is a JSON string? => move it to attribture 'inner'
         if ( ccm.helper.regex( 'json' ).test( element.innerHTML ) ) { element.setAttribute( 'inner', element.innerHTML ); element.innerHTML = ''; }
@@ -2042,7 +2042,7 @@
        * transforms HTML to a HTML element and replaces placeholders (recursive)
        * @param {string|ccm.types.html|ccm.types.html[]|Node|jQuery|function} html
        * @param {...string|Object} [values] - values to replace placeholder
-       * @param {Object} [settings] - advanced settings
+       * @param {Object} [settings={}] - advanced settings
        * @param {boolean} [settings.no_evaluation] - skips evaluation of ccm HTML elements
        * @param {string} [settings.namespace_uri] - sets namespace URI for created elements
        * @returns {Element|Element[]} HTML element
@@ -2053,17 +2053,17 @@
         if ( !html ) return html;
 
         // is already a HTML element and no placeholders have to be replaced? => nothing to do
-        if ( ccm.helper.isElement( html ) && values === undefined ) return html;
+        if ( ccm.helper.isElement( html ) && !values.length ) return html;
 
         // is function that returns a lit-html template result?
-        if ( typeof html === 'function' )
-          return html.apply( this, values );
+        if ( typeof html === 'function' ) return html.apply( this, values );
 
         // handle advanced settings
         let advanced = {};
-        const last = values[ values.length - 1 ];
-        if ( ccm.helper.isObject( last ) && !last.tag && !last.inner )
+        if ( values.length > 1 && ccm.helper.isObject( values[ values.length - 1 ] ) ) {
           advanced = values.pop();
+          if ( values[ 0 ] === undefined ) values.shift();
+        }
 
         // convert HTML to ccm HTML data
         html = ccm.helper.html2json( html );
@@ -2083,7 +2083,7 @@
           // generate each HTML tag
           const result = [];
           for ( let i = 0; i < html.length; i++ )
-            result.push( ccm.helper.html( html[ i ], advanced ) );  // recursive call
+            result.push( ccm.helper.html( html[ i ], undefined, advanced ) );  // recursive call
           return result;
 
         }
@@ -2135,7 +2135,7 @@
             case 'inner':
               if ( typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ) { element.innerHTML = value; break; }
               let children = Array.isArray( value ) ? value : [ value ];
-              children.forEach( child => element.appendChild( this.html( child, advanced ) ) );
+              children.forEach( child => element.appendChild( this.html( child, undefined, advanced ) ) );
               break;
 
             // HTML value attributes and events
