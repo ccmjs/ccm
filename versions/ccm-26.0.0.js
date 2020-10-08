@@ -20,6 +20,8 @@
  * - ccm.helper.html() accepts functions that return a TemplateResult from lit-html
  * - bug fix for ccm.helper.html() when last parameter is HTML data
  * - each instance knows her children instances at <code>instance.children</code>
+ * - a dataset key can also be a number
+ * - bug fix for invalid keys on data operations
  * - code refactoring
  * - updated doc comments
  * (for older version changes see ccm-25.5.3.js)
@@ -212,7 +214,7 @@
       key_or_query = ccm.helper.clone( key_or_query );
 
       // invalid key? => abort
-      if ( !ccm.helper.isObject( key_or_query ) && !ccm.helper.isKey( key_or_query ) ) reject( new Error( 'invalid dataset key: ' + key_or_query ) );
+      if ( !ccm.helper.isObject( key_or_query ) && !ccm.helper.isKey( key_or_query ) ) return reject( new Error( 'invalid dataset key: ' + key_or_query ) );
 
       // detect managed data level
       that.url ? serverDB() : ( that.name ? clientDB() : localCache() );
@@ -271,7 +273,7 @@
       if ( !priodata.key ) priodata.key = ccm.helper.generateKey();
 
       // priority data contains invalid key? => abort
-      if ( !ccm.helper.isKey( priodata.key ) && !ccm.helper.isObject( priodata.key ) ) reject( new Error( 'invalid dataset key: ' + priodata.key ) );
+      if ( !ccm.helper.isKey( priodata.key ) && !ccm.helper.isObject( priodata.key ) ) return reject( new Error( 'invalid dataset key: ' + priodata.key ) );
 
       // detect managed data level
       that.url ? serverDB() : ( that.name ? clientDB() : localCache() );
@@ -314,7 +316,7 @@
     this.del = key => new Promise( ( resolve, reject ) => {
 
       // invalid key? => abort
-      if ( !ccm.helper.isKey( key ) ) reject( new Error( 'invalid dataset key: ' + key ) );
+      if ( !ccm.helper.isKey( key ) ) return reject( new Error( 'invalid dataset key: ' + key ) );
 
       // detect managed data level
       that.url ? serverDB() : ( that.name ? clientDB() : localCache() );
@@ -2395,7 +2397,7 @@
       isKey: value => {
 
         // value is a string? => check if it is an valid key
-        if ( typeof value === 'string' ) return ccm.helper.regex( 'key' ).test( value );
+        if ( typeof value === 'string' || typeof value === 'number' ) return ccm.helper.regex( 'key' ).test( value );
 
         // value is an array? => check if it is an valid array key
         if ( Array.isArray( value ) ) {
