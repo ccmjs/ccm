@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>ccmjs Tutorial: Data Management</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cerulean.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">ccmjs</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="ccm.html">ccm</a></li><li><a href="ccm.helper.html">ccm.helper</a></li><li><a href="ccm.types.html">ccm.types</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="tutorial-backwards-compatibility.html">Backwards Compatibility</a></li><li><a href="tutorial-data-management.html">Data Management</a></li><li><a href="tutorial-html-templating.html">HTML Templating</a></li><li><a href="tutorial-instance-communication.html">Instance Communication</a></li><li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li><li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			<section class="tutorial-section">
+
+<header>
+    
+
+    <h2>Data Management</h2>
+</header>
+
+<article>
+    <h3>Table Of Contents</h3>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#choosable-data-levels">Choosable Data Levels</a>
+<ul>
+<li><a href="#data-level-1-javascript-object">Data Level 1: JavaScript Object</a></li>
+<li><a href="#data-level-2-indexeddb">Data Level 2: IndexedDB</a></li>
+<li><a href="#data-level-3-server-side-database">Data Level 3: Server-side Database</a></li>
+</ul>
+</li>
+<li><a href="#dataset-properties">Dataset Properties</a></li>
+<li><a href="#usage-example">Usage Example</a></li>
+<li><a href="#supported-operations">Supported Operations</a></li>
+<li><a href="#synchron-vs-asynchron">Synchron vs. Asynchron</a></li>
+<li><a href="#data-caching">Data Caching</a></li>
+<li><a href="#server-interface">Server Interface</a></li>
+<li><a href="#usable-network-protocols">Usable Network Protocols</a></li>
+<li><a href="#real-time-communication">Real-time Communication</a></li>
+</ul>
+<h3>Introduction</h3>
+<p>The <a href="Framework"><em>ccm</em> framework</a> provides a service for component developer for flexible data management.<br>
+The service could be used with the method <code>ccm.store</code>. This method allows the usage of <em>ccm</em> datastores. A <em>ccm</em> datastore can manage datasets in one of three <a href="#choosable-data-levels">choosable data levels</a> and could also be used autonomously of <em>ccm</em> components for easy data management.</p>
+<h3>Choosable Data Levels</h3>
+<h4>Data Level 1: JavaScript Object</h4>
+<p>On the first level the data will be managed in an <a href="http://akless.github.io/ccm-developer/api/ccm/ccm.Datastore.html#local">local JavaScript object</a>. Than all managed datasets are fugitive data which are gone when webpage is reloaded.</p>
+<h4>Data Level 2: IndexedDB</h4>
+<p>On the second level the data will be managed in the clientside database <a href="https://en.wikipedia.org/wiki/Indexed_Database_API">IndexedDB</a>. Than all managed data is still there after page reload. This is specially interesting for offline functionality.</p>
+<h4>Data Level 3: Server-side Database</h4>
+<p>On the third level the data will be managed in any server-side database of choice. The server must have an <a href="#server-interface"><em>ccm</em> compatible interface</a>. Than all managed datasets are stored persistent on a server and they are not bounded to a specific client. Different <a href="#usable-network-protocols">network protocols</a> are possible for communication between client and server.</p>
+<p>The following image shows an overview about <em>ccm</em> data management:</p>
+<p><img src="http://akless.github.io/ccm-developer/images/DataManagement.png" alt="Overview about ccm data management."></p>
+<h3>Dataset Properties</h3>
+<p>Every managed dataset must have a property <code>key</code> which contains the unique key of the dataset. There are no conventions for other properties. They can be as they want.</p>
+<p>The following code shows an example for a <em>ccm</em> dataset:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;key&quot;: &quot;quizz&quot;,
+  &quot;question&quot;: &quot;What is the meaning of life?&quot;,
+  &quot;answers&quot;: [ &quot;nothing&quot;, &quot;don't know&quot;, &quot;ccm programming&quot;, &quot;other things&quot; ],
+  &quot;type&quot;: &quot;multiple_choice&quot;
+}
+</code></pre>
+<h3>Usage Example</h3>
+<p>The following code shows an first simple example for working with a <em>ccm</em> datastore:</p>
+<pre class="prettyprint source lang-js"><code>// create a empty datastore of data level 1
+var store = ccm.store();
+
+// store new dataset with unique key 'test' in created datastore
+var created_dataset = store.set( { key: 'test', value: 4711 } );
+
+// get stored dataset
+var requested_dataset = store.get( 'test' );
+
+// update stored dataset
+var updated_dataset = store.set( { key: 'test', value: 'foo' } );
+
+// delete stored dataset
+var deleted_dataset = store.del( 'test' );
+</code></pre>
+<p>For more detail how to use the method <code>ccm.store</code> see the <a href="http://akless.github.io/ccm-developer/api/ccm/ccm.html#.store">documentation of the method</a>.</p>
+<h3>Supported Operations</h3>
+<p>A <em>ccm</em> datastore supports the following operation:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>get(key)</td>
+<td>Get a single dataset with the given key.</td>
+</tr>
+<tr>
+<td>get(query)</td>
+<td>Get all datasets that matches the given query.</td>
+</tr>
+<tr>
+<td>set(data)</td>
+<td>Create a new dataset that contains the given data.</td>
+</tr>
+<tr>
+<td>set(prio)</td>
+<td>Updates a existing dataset with given priority data.</td>
+</tr>
+<tr>
+<td>del(key)</td>
+<td>Delete a existing dataset with given key.</td>
+</tr>
+</tbody>
+</table>
+<p>For more details how to use these operations see the <a href="http://akless.github.io/ccm-developer/api/ccm/ccm.Datastore.html">part for <em>ccm</em> datastores</a> in the <a href="http://akless.github.io/ccm-developer/api/ccm/">API</a> of the <a href="Framework"><em>ccm</em> framework</a>. Here you see which data level supports which operations:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th style="text-align:center">L1: JavaScript Object</th>
+<th style="text-align:center">L2: IndexedDB</th>
+<th style="text-align:center">L3: Redis</th>
+<th style="text-align:center">L3: MongoDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>get(key)</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+</tr>
+<tr>
+<td>get(query)</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">supported*</td>
+</tr>
+<tr>
+<td>set(data)</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+</tr>
+<tr>
+<td>set(prio)</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported**</td>
+<td style="text-align:center">supported***</td>
+</tr>
+<tr>
+<td>del(key)</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+<td style="text-align:center">supported</td>
+</tr>
+</tbody>
+</table>
+<p>* all specific MongoDB queries are possible<br>
+** no partial update (updates always complete dataset)<br>
+*** support deep partial updates (with dot notation)</p>
+<p>Note that on data level 3 the server not only can have Redis and MongoDB as database. This are only common examples. For example the server-side database must not be an NoSQL database. Which of the operations other databases support depends mainly on the <a href="#server-interface">server interface</a>.</p>
+<h3>Synchron vs. Asynchron</h3>
+<p>Each of the <a href="#supported-operations">datastore operations</a> has a callback as second parameter. The result of an operation will be provided to the callback function as first parameter. If the operation don't causes any asynchron operation, the result will be also provided as return value. Operations on <a href="#data-level-1-javascript-object">data level 1</a> are synchron and operations on higher <a href="#choosable-data-levels">data levels</a> are asynchron. No matter of synchron or asynchron, in case of doubt use the callback function to collect the requested dataset(s). Using callbacks gives also the possibility to switch anytime to another data level without code changes.</p>
+<p>The following example shows collecting the result of an <em>ccm</em> datastore operation in both ways:</p>
+<pre class="prettyprint source lang-js"><code>var store = ccm.store();
+var synchron_result = store.get( function ( asynchron_result ) {
+  console.log( asynchron_result );
+} );
+console.log( synchron_result );
+</code></pre>
+<h3>Data Caching</h3>
+<p>On <a href="#data-level-1-javascript-object">data level 1</a> the data will be managed in an <a href="http://akless.github.io/ccm-developer/api/ccm/ccm.Datastore.html#local">local JavaScript object</a>. On higher data levels this object acts as a local cache. Then all results of every datastore operation are local cached. When requesting datasets that are already cached, the datasets are taken from there. This results in a shorter execution time. Another effect is that requests for already cached datasets are synchron and the result can received directly as return value of the method call:</p>
+<pre class="prettyprint source lang-js"><code>// provides a datastore of data level 2
+var store = ccm.store( { store: 'my_store' } );
+
+// The first request for the dataset is asynchron and the result
+store.get( 'test', function () {  // dataset is now local cached.
+
+  // The second dataset request is synchron and the result is receivable
+  var result = store.get( 'test' );  // as return value of the method call.
+
+} );
+</code></pre>
+<h3>Server Interface</h3>
+<p>When a client uses a <em>ccm</em> datastore of <a href="#data-level-3-server-side-database">data level 3</a> for data management, than the client must declare an URL to an <em>ccm</em> compatible server interface in the <a href="http://akless.github.io/ccm-developer/api/ccm/ccm.types.html#.settings">datastore settings</a>. Then all <a href="#supported-operations">datastore operations</a> will be forwarded to this server interface. The server interface then can forward this operations to the server-side database. In this step the server interface must transform the according data in the form which the specific database can handle. Then the server interface sends the results back to the client in the form the client-side datastore can receive them.</p>
+<p>The following example shows a very simple dummy server interface in <a href="https://en.wikipedia.org/wiki/PHP">PHP</a> which receives the forwarded datastore operations and send them back to client without forwarding to a database:</p>
+<pre class="prettyprint source lang-php"><code>&lt;?php
+// receive datastore operation
+$key     = $_GET[ 'key' ];      // get
+$dataset = $_GET[ 'dataset' ];  // set (create or update)
+$del     = $_GET[ 'del' ];      // del
+
+// send dummy response back to client
+if ( $key )     die( array( 'key' => $key, 'value' => 'foo' ) );   // get
+if ( $dataset ) { $dataset[ 'value' ] = 'bar'; die( $dataset ); }  // set
+if ( $del )     die( array( 'key' => $del, 'value' => 'baz' ) );   // del
+?>
+</code></pre>
+<p>The server interface must not be written in PHP. For example it can also be written in JavaScript (with <a href="https://en.wikipedia.org/wiki/Node.js">Node.js</a>). An better professional server interface should think of the following aspects:</p>
+<ul>
+<li>Cross-domain data transmissions with CORS or JSONP</li>
+<li>Support of different <a href="#usable-network-protocols">network protocols</a></li>
+<li>Security mechanisms for
+<ul>
+<li>user authentication</li>
+<li>user rights for data operations</li>
+<li>secure <a href="#usable-network-protocols">network protocols</a></li>
+</ul>
+</li>
+<li>More than one choosable database</li>
+<li>Support of stable and efficient realtime communication</li>
+<li>Server stability, availability and scalability</li>
+</ul>
+<h3>Usable Network Protocols</h3>
+<p>Different network protocols could be used for data transmission between client and server depending on the supported network protocols of the <a href="#server-interface">server interface</a>. For example an server interface could support some of the following protocols:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">Hypertext Transfer Protocol (HTTP)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/HTTPS">Hypertext Transfer Protocol Secure (HTTPS)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket (WS)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/WebSocket#Proxy_traversal">WebSocket Secure (WSS)</a></li>
+</ul>
+<p>To choose on client-side which supported network protocol should be used, simple use the corresponding prefix in the URL to the server interface in the datastore settings. For example:</p>
+<ul>
+<li><strong>http</strong>://path/to/server/interface.php</li>
+<li><strong>https</strong>://path/to/server/interface.php</li>
+<li><strong>ws</strong>://path/to/server/interface.php</li>
+<li><strong>wss</strong>://path/to/server/interface.php</li>
+</ul>
+<h3>Real-time Communication</h3>
+<p>In case of <a href="https://en.wikipedia.org/wiki/WebRTC">realtime communication</a> with <a href="https://en.wikipedia.org/wiki/WebSocket">Web Socket</a> as <a href="#usable-network-protocols">network protocol</a> for a <em>ccm</em> datastore with <a href="#data-level-3-server-side-database">data level 3</a>, the server informs every active client about changing datasets. To react to this informations on client-side there only must be declared a <code>onChange</code> callback for the datastore. The parameters of the callback contain the server informations about the changed dataset.</p>
+<p>The following code shows an example for declaring  a <code>onChange</code> callback:</p>
+<pre class="prettyprint source lang-js"><code>ccm.store( {
+  store: 'my_store',
+  url: 'http://path/to/server/interface.php',
+  onChange: function () {
+    console.log( arguments );  // Shows the server informations about changed
+  }                            // stored datasets in the developer console.
+} );
+</code></pre>
+<p>Note that changing a dataset not triggers the own onChange event. The server informs only <strong>other</strong> clients about changed data. Open the same website in a second browser tab to trigger the event.</p>
+</article>
+
+</section>
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+	<p style='text-align:center'>This Documentation is written by the Developer of <i>ccmjs</i>: <a href='mailto:andre.kless@web.de'>André Kless</a></p>
+
+
+	<span class="copyright">
+	<a href='https://en.wikipedia.org/wiki/MIT_License'>MIT Licence</a>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a>
+	
+		on 2020-10-02T16:03:55+02:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

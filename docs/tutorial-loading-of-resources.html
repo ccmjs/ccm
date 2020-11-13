@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>ccmjs Tutorial: Loading of Resources</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cerulean.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">ccmjs</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="ccm.html">ccm</a></li><li><a href="ccm.helper.html">ccm.helper</a></li><li><a href="ccm.types.html">ccm.types</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="tutorial-backwards-compatibility.html">Backwards Compatibility</a></li><li><a href="tutorial-data-management.html">Data Management</a></li><li><a href="tutorial-html-templating.html">HTML Templating</a></li><li><a href="tutorial-instance-communication.html">Instance Communication</a></li><li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li><li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			<section class="tutorial-section">
+
+<header>
+    
+
+    <h2>Loading of Resources</h2>
+</header>
+
+<article>
+    <h3>Overview</h3>
+<p><em>ccmjs</em> provides a service for asynchronous loading of resources. It could be used with the method <a href="ccm.html#.load">ccm.load</a>.
+You can load resources like HTML, CSS, Images, JavaScript, Modules, JSON and XML data on-demand and cross-domain.
+On a single call several resources can be loaded at once. It can be flexibly controlled which resources are load in serial and which in parallel.
+<a href="ccm.html#.load">ccm.load</a> can be used in an <a href="ccm.types.html#.instance_config">instance configuration</a> to define dependencies to other resources.</p>
+<h3>Simplest Case: Loading by URL</h3>
+<p>In the simplest case, only an URL is passed as a parameter for a resource to be loaded:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load( 'style.css' );
+</code></pre>
+<p>The URL of the resource can be a relative or an absolute path.
+The resource does not have to be within the same domain and can be loaded cross-domain.</p>
+<h3>Loading by Object</h3>
+<p>Instead of an URL, a <a href="ccm.types.html#.resource_obj">resource object</a> can be passed, which then contains other information besides the URL, via which the loading of the resource is even more flexible controllable.
+For example, when loading a resource, it can be specified in which context it is loaded.
+With this, the CSS contained in a CSS file can be loaded into a specific <a href="https://en.wikipedia.org/wiki/Web_Components#Shadow_DOM">Shadow DOM</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>const shadow = document.createElement( 'div' );
+shadow.attachShadow( { mode: 'open' } );
+
+ccm.load( { url: 'style.css', context: shadow } );
+</code></pre>
+<h3>Method Result</h3>
+<p>The method <a href="ccm.html#.load">ccm.load</a> is an asynchronous function and returns a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> that provides the result.
+The following example loads the content of an HTML file:</p>
+<pre class="prettyprint source lang-javascript"><code>// Promise
+ccm.load( 'hello.html' ).then( result => {} );
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>// async await
+const result = await ccm.load( 'hello.html' );
+</code></pre>
+<pre class="prettyprint source lang-html"><code>&lt;!-- hello.html -->
+Hello, &lt;b>World&lt;/b>!
+</code></pre>
+<p>The variable <code>result</code> now contains the HTML string <code>&quot;Hello, &lt;b&gt;World&lt;/b&gt;!&quot;</code>.</p>
+<h2>Error Handling</h2>
+<p>If loading of a resource fails, the resulting <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> will be rejected:</p>
+<pre class="prettyprint source lang-javascript"><code>// Promise
+ccm.load( 'not_exits.html' ).catch( error => {} );
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>// async await
+try {
+  await ccm.load( 'not_exists.html' );
+}
+catch ( error ) {}
+</code></pre>
+<p>The variable <code>error</code> then contains an object with informations about the error.
+The following table shows what information this object contains:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>call</code></td>
+<td>Action data of the original method call.</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>Object of the <a href="https://www.w3schools.com/xml/xml_http.asp">XMLHttpRequest</a>.</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>Error object of the failed <a href="https://www.w3schools.com/xml/xml_http.asp">XMLHttpRequest</a>.</td>
+</tr>
+<tr>
+<td><code>resource</code></td>
+<td>Passed <a href="ccm.types.html#.resource_obj">resource object</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>In case of a <a href="https://www.w3schools.com/xml/xml_http.asp">XMLHttpRequest</a> the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status code</a> and the response text can be checked via <code>data</code> and with <code>error</code> you can get the responded error message:</p>
+<pre class="prettyprint source lang-javascript"><code>try {
+  await ccm.load( 'not_available.html' );
+}
+catch ( error ) {
+  if ( error.data.status === 404 )     // not found?
+    alert( error.error.message );      // => show error message of XMLHttpRequest
+  else if ( error.data.responseText )  // error with response text?
+    alert( error.data.responseText );  // => show response text
+  else
+    alert( 'Something went wrong' );
+}
+</code></pre>
+<p>Watch the <code>error</code> variable in the developer console to see what other useful data is included.</p>
+<h2>Loading with Timeout</h2>
+<p>For loading resources, a <a href="ccm.html#.timeout">timeout</a> can be set:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.timeout = 10000;  // timeout after 10 seconds
+</code></pre>
+<p>In this example, resources that last longer than 10 seconds would fail. By default, there is no time limit.
+If a result is received after the timeout has expired, a message like this appears in the developer console:</p>
+<pre class="prettyprint source lang-html"><code>[ccmjs] loading of https://my.domain/bigdata.php succeeded after timeout (10000ms)
+</code></pre>
+<h2>Loading of Multiple Resources at Once</h2>
+<p>On a single <a href="ccm.html#.load">ccm.load</a> call several resources can be loaded at once:</p>
+<pre class="prettyprint source lang-javascript"><code>const results = await ccm.load( 'hello.html', 'style.css', 'image.png' );
+</code></pre>
+<p>When multiple resources are loaded, the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> provides an array instead of a single value as the result.
+The array contains the results in the order in which the parameters were passed.
+If loading a resource does not supply anything specific, the default result is the URL of the resource. This applies, for example, when loading CSS and images.
+The variable <code>results</code> now contains:</p>
+<pre class="prettyprint source lang-json"><code>[ &quot;Hello, &lt;b>World&lt;/b>!&quot;, &quot;style.css&quot;, &quot;image.png&quot; ]
+</code></pre>
+<p>If loading of at least one of the resources fails, the result is still an array. For failed resources, the array will contain the error object instead of the result:</p>
+<pre class="prettyprint source lang-javascript"><code>try {
+  await ccm.load( 'not_exists.html', 'style.css', 'image.png' );
+}
+catch ( error ) {
+  console.log( error );  // [ {error object}, &quot;style.css&quot;, &quot;image.png&quot; ]
+}
+</code></pre>
+<h2>Parallel and Serial Loading of Resources</h2>
+<p>It can be flexibly controlled which resources are loaded serially and which ones in parallel.
+By default, resources are loaded in parallel.
+When resources are to be loaded one after another, they simply need to be passed as an array:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load( [ 'hello.html', 'style.css' ] );
+</code></pre>
+<p>In the example, the two resources are now loaded serially.
+The serial and parallel loading can be flexibly controlled as deep as desired.
+With each deeper array level you switch between serial and parallel loading:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load(
+  'hello.html',     // Array Level 0: Parallel
+  [
+    'style.css',    // Array Level 1: Serial
+    'image.png',
+    [
+      'data.json',  // Array Level 2: Parallel
+      'script.js'
+    ],
+    'logo.gif'
+  ],
+  'picture.jpg'
+);
+</code></pre>
+<p>The example loads the resources in the following timeline:</p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Timeline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hello.html</code></td>
+<td>******------------------</td>
+</tr>
+<tr>
+<td><code>style.css</code></td>
+<td>******------------------</td>
+</tr>
+<tr>
+<td><code>image.png</code></td>
+<td>------******------------</td>
+</tr>
+<tr>
+<td><code>data.json</code></td>
+<td>------------******------</td>
+</tr>
+<tr>
+<td><code>script.js</code></td>
+<td>------------******------</td>
+</tr>
+<tr>
+<td><code>logo.gif</code></td>
+<td>------------------******</td>
+</tr>
+<tr>
+<td><code>picture.jpg</code></td>
+<td>******------------------</td>
+</tr>
+</tbody>
+</table>
+<h2>Loading of HTML</h2>
+<p>Loading an HTML file results in a string that contains the content of the loaded HTML file:</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- hello.html -->
+Hello, World!
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'hello.html' );
+</code></pre>
+<p>The variable <code>result</code> now contains the HTML string <code>&quot;Hello, &lt;b&gt;World&lt;/b&gt;!&quot;</code>.
+An HTML string can be converted into an HTML element with the help method <a href="ccm.helper.html#.html">ccm.helper.html</a> and
+with <a href="ccm.helper.html#.html2json">ccm.helper.html2json</a> you can transform an HTML string to JSON.
+An HTML file can contain multiple HTML templates.
+Each template must then be wrapped with <code>&lt;ccm-template key=&quot;mykey&quot;&gt;</code>, where <code>mykey</code> is a unique <a href="ccm.types.html#.key">key</a> for the template:</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- templates.html -->
+
+&lt;ccm-template key=&quot;main&quot;>
+  &lt;header>...&lt;/header>
+  ...
+  &lt;footer>...&lt;/footer>
+&lt;/ccm-template>
+
+&lt;ccm-template key=&quot;entry&quot;>
+  &lt;h3>...&lt;/h3>
+  &lt;p>...&lt;/p>
+&lt;/ccm-template>
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'templates.html' );
+</code></pre>
+<p>The variable <code>result</code> then contains an object with the loaded HTML templates:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;main&quot;: &quot; &lt;header>...&lt;/header> ... &lt;footer>...&lt;/footer> &quot;,
+  &quot;entry&quot;: &quot; &lt;h3>...&lt;/h3> &lt;p>...&lt;/p> &quot;
+}
+</code></pre>
+<h2>Loading of CSS</h2>
+<p>CSS is loaded by adding a <code>&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;url&quot;&gt;</code> in the <a href="https://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>, where <code>url</code> is the URL of the CSS file.
+Use the <code>context</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> to control in which element the <code>&lt;link&gt;</code> tag will be appended.
+With this, the CSS contained in a CSS file can be loaded into a <a href="https://en.wikipedia.org/wiki/Web_Components#Shadow_DOM">Shadow DOM</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>const shadow = document.createElement( 'div' );
+shadow.attachShadow( { mode: 'open' } );
+
+await ccm.load( { url: 'style.css', context: shadow } );
+</code></pre>
+<p>By default, the CSS is loaded in the <code>&lt;head&gt;</code> of the webpage:</p>
+<pre class="prettyprint source lang-javascript"><code>await ccm.load( 'style.css' );
+</code></pre>
+<pre class="prettyprint source lang-html"><code>&lt;head>
+  ...
+  &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;style.css&quot;>
+&lt;/head>
+</code></pre>
+<p>With the <code>attr</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> you can add additional HTML attributes to the <code>&lt;link&gt;</code> tag.
+For example this allows you to load CSS with <a href="https://developer.mozilla.org/de/docs/Web/Security/Subresource_Integrity">Subresource Integrity</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>await ccm.load( {
+  url: 'style.css',
+  attr: {
+    integrity: 'sha384-TNlMHgEvh4ObcFIulNi29adH0Fz/RRputWGgEk/ZbfIzua6sHbLCReq+SZ4nfISA',
+    crossorigin: 'anonymous'
+  }
+} );
+</code></pre>
+<pre class="prettyprint source lang-html"><code>&lt;head>
+  ...
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot; integrity=&quot;sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z&quot; crossorigin=&quot;anonymous&quot;>
+&lt;/head>
+</code></pre>
+<p>Loading of a CSS resolves, when the <code>onload</code> event of the <code>&lt;link&gt;</code> tag fires.
+When the exact same <code>&lt;link&gt;</code> tag is already present in the context, then loading of CSS succeeds
+without appending the same <code>&lt;link&gt;</code> tag again, because the CSS seems to be already loaded in this context.
+The result value is the URL of the CSS file.</p>
+<h2>Loading of Images</h2>
+<p>The method <a href="ccm.html#.load">ccm.load</a> can be used for preloading images:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load( 'image1.png', 'image2.jpg', 'image3.gif' );
+</code></pre>
+<p>In the example the three images are loaded in parallel and are than in the browser cache.
+Loading of an image resolves, when the <code>onload</code> event of the intern created image object fires.
+The result value is the URL of the image file.</p>
+<h2>Loading of JavaScript</h2>
+<p>Loading a JavaScript file will execute the JavaScript code contained in the file.
+The JavaScript is loaded by adding a <code>&lt;script src=&quot;url&quot; async&gt;</code> in the <a href="https://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>, where <code>url</code> is the URL of the JavaScript file.
+Loading of JavaScript resolves, when the <code>onload</code> event of the <code>&lt;script&gt;</code> tag fires.
+After the JavaScript code has executed, the no more needed <code>&lt;script&gt;</code> tag will be removed from the <a href="https://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>.
+The result value is the URL of the JavaScript file, but the loaded JavaScript code can also set the result individually:</p>
+<pre class="prettyprint source lang-javascript"><code>/* script.js */
+ccm.files[ 'script.js' ] = { foo: 'bar' };
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'script.js' );
+console.log( result );  // => { &quot;foo&quot;: &quot;bar&quot; }
+</code></pre>
+<p>The result value of a loaded JavaScript file is what the contained JavaScript code puts in <code>ccm.files[ 'filename' ]</code>, where <code>filename</code> is the filename of the JavaScript file.
+Otherwise, the result is the URL of the file as usual.
+Using this convention, a JavaScript file can provide data across domains.
+The publicly fetched data in the global namespace <a href="ccm.html#.files">ccm.files</a> will be directly deleted.
+In case of a minimized JavaScript file, the <code>.min</code> in the filename can be omitted:</p>
+<pre class="prettyprint source lang-javascript"><code>/* script.min.js */
+ccm.files['script.js']={foo:'bar'};
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'script.min.js' );
+console.log( result );  // => { &quot;foo&quot;: &quot;bar&quot; }
+</code></pre>
+<p>With the <code>attr</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> you can add additional HTML attributes to the <code>&lt;script&gt;</code> tag.
+For example this allows you to load JavaScript with <a href="https://developer.mozilla.org/de/docs/Web/Security/Subresource_Integrity">Subresource Integrity</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>await ccm.load( {
+  url: 'script.js',
+  attr: {
+    integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW',
+    crossorigin: 'anonymous'
+  }
+} );
+// &lt;script src=&quot;script.js&quot; async integrity=&quot;sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW&quot; crossorigin=&quot;anonymous&quot;>
+</code></pre>
+<h2>Loading of Modules</h2>
+<p>Loading a module gives you an object as result that contains all the exported members of the module:</p>
+<pre class="prettyprint source lang-javascript"><code>/* module.mjs */
+export const name = 'John';
+export const data = { foo: 'bar' };
+export function sayHello( name ) { console.log( `Hello, ${name}!` ); }
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'module.mjs' );
+result.sayHello( result.name );  // => 'Hello, John!'
+console.log( result.data );      // => {&quot;foo&quot;:&quot;bar&quot;}
+</code></pre>
+<p>In the example <code>result</code> now contains all exported members of the module.
+An <code>import * as result from 'url'</code> is executed internally, where <code>result</code> is the result object and <code>url</code> is the URL of the module file.
+It is also possible to get a specific exported member only as result:</p>
+<pre class="prettyprint source lang-javascript"><code>const sayHello = await ccm.load( 'module.mjs#sayHello' );
+sayHello( 'Jane' );  // => 'Hello, Jane!'
+</code></pre>
+<p>Then intern an <code>import {key} as result from 'url'</code> is executed, where <code>key</code> is the name of the specific member.
+The member name can be set at the end of the URL after a <code>#</code>.
+This allows the definition of dependencies to a certain function within an <a href="ccm.types.html#.instance_config">instance configuration</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>const config = {
+  sayHello: [ 'ccm.load', 'module.mjs#sayHello' ]
+}
+</code></pre>
+<p>You can also get a specific subset of exported members.
+For this, several member names can be specified at the end of the URL separated by a <code>#</code>:</p>
+<pre class="prettyprint source lang-javascript"><code>const subset = await ccm.load( 'module.mjs#data#name' );
+console.log( subset );  // => {&quot;data&quot;:{&quot;foo&quot;:&quot;bar&quot;},&quot;name&quot;:&quot;John&quot;}
+</code></pre>
+<p>Just like loading JavaScript, with the <code>attr</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> you can add additional HTML attributes to the <code>&lt;script&gt;</code> tag.</p>
+<h2>Loading of JSON Data</h2>
+<p>In the following example JSON data is load from a server interface:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'hello.php' );
+console.log( result );  // => &quot;Hello, World!&quot;
+</code></pre>
+<pre class="prettyprint source lang-php"><code>/* hello.php */
+&lt;?php
+echo 'Hello, World!';
+?>
+</code></pre>
+<p>As default, the JSON data is load by <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a> with the HTTP method <code>POST</code>.
+Loading of JSON cross-domain works only if <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> or <a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> is working.
+Individual HTTP parameters can be set with the <code>params</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( {
+  url: 'echo.php',
+  params: {         // sets HTTP parameters
+    name: 'John'
+  }
+} );
+console.log( result );  // => &quot;Hello, John!&quot;
+</code></pre>
+<pre class="prettyprint source lang-php"><code>/* echo.php */
+&lt;?php
+echo 'Hello, '.filter_input( INPUT_POST, 'name', FILTER_SANITIZE_STRING );
+?>
+</code></pre>
+<p>The used HTTP method can be set by the <code>method</code> property:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( {
+  url: 'hello.php',
+  method: 'GET'      // sets HTTP method
+} );
+</code></pre>
+<p>With the <code>headers</code> property, you can set additional HTTP headers:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( {
+  url: 'hello.php',
+  headers: {  // sets additional HTTP headers
+    Authorization: 'Basic ' + btoa( user + ':' + token )
+  }
+} );
+</code></pre>
+<p>JSON data can also be loaded via <a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> if the server side supports it:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( {
+  url: 'https://other.domain.com/data.php',
+  method: 'JSONP'  // turns on JSONP
+} );
+console.log( result );  // => {&quot;foo&quot;:&quot;bar&quot;}
+</code></pre>
+<pre class="prettyprint source lang-php"><code>/* data.php */
+&lt;?php
+$callback = filter_input( INPUT_GET, 'callback', FILTER_SANITIZE_STRING );
+echo $callback.'({&quot;foo&quot;:&quot;bar&quot;});';
+?>
+</code></pre>
+<p>With <a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> the JSON data is load via <code>&lt;script&gt;</code> tag. So just like loading JavaScript, with the <code>attr</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> you can add additional HTML attributes to the <code>&lt;script&gt;</code> tag.
+<a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> is only necessary if the data has to be loaded cross-domain.
+<a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> is not required if <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> is already working.</p>
+<p>Another option is to let <a href="ccm.html#.load">ccm.load</a> use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">fetch API</a>.
+The second parameter of <code>fetch(url,init)</code> can be passed via the <code>init</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a>:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( {
+  url: 'https://other.domain.com/data.php',
+  method: 'fetch',  // uses fetch API
+  init: {
+    method: 'POST',
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer'
+  }
+} );
+console.log( result );  // => {&quot;foo&quot;:&quot;bar&quot;}
+</code></pre>
+<p>This allows you to use the full power of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">fetch API</a> in resource dependencies:</p>
+<pre class="prettyprint source lang-javascript"><code>const config = {
+  sayHello: [ 'ccm.load', { url: 'sayHello.php', method: 'fetch', init: {...} } ]
+}
+</code></pre>
+<h2>Loading of XML Data</h2>
+<p>The following example loads an XML file:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'data.xml' );
+console.log( result );  // => #document
+</code></pre>
+<p>The <code>result</code> variable than contains a <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLDocument">XMLDocument</a> containing the loaded XML.
+Loading of XML cross-domain works only if <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> is working.</p>
+<h2>Loading a Resource Regardless of its File Extension</h2>
+<p>Normally <a href="ccm.html#.load">ccm.load</a> automatically recognizes at the file extension how the resource should be loaded.
+When the <code>type</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> is specified, the file extension of the resource is ignored and the resource is loaded as the specified type.
+If <code>type</code> is not specified and the file extension is unknown, loading of JSON is assumed.
+This allows you the dynamic loading of resources.</p>
+<h3>Dynamic Loading of CSS</h3>
+<p>The following example loads CSS from a PHP interface:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load( { url: 'style.php', type: 'css' } );
+</code></pre>
+<pre class="prettyprint source lang-php"><code>/* style.php */
+&lt;?php
+header( 'Content-Type: text/css' );
+?>
+b { color: red; }
+</code></pre>
+<p>Although the resource does not have the file extension <code>.css</code>, it will be loaded like a CSS file.
+The <code>&lt;head&gt;</code> now contains: <code>&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;style.php&quot;&gt;</code>.</p>
+<h3>Dynamic Loading of an Image</h3>
+<p>This example preloads an image that comes from a PHP interface:</p>
+<pre class="prettyprint source lang-javascript"><code>ccm.load( { url: 'image.php', type: 'image' } );
+</code></pre>
+<pre class="prettyprint source lang-php"><code>&lt;?php
+header( 'Content-Type: image/png' );
+readfile( 'intern/image.png' );
+?>
+</code></pre>
+<p>If the PHP interface would additionally implement user authentication, images could be made available to specific user groups. An HTTP parameter could also be used to control which image should be delivered.</p>
+<h3>Dynamic Loading of JavaScript</h3>
+<p>In this example JavaScript is load from a PHP interface:</p>
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( { url: 'script.php', type: 'js' } );
+</code></pre>
+<pre class="prettyprint source lang-php"><code>/* js.php */
+ccm.files[ 'js.php' ] = { foo: '&lt;? echo 'bar'; ?>' };
+console.log( 'Hello, &lt;? echo 'World'; ?>!' );
+</code></pre>
+<p>The <code>&lt;head&gt;</code> now contains: <code>&lt;script src=&quot;script.php&quot;&gt;</code>.</p>
+<p>Result in the Developer Console: <code>Hello, World!</code></p>
+<p>Result of the resolved Promise: <code>{&quot;foo&quot;:&quot;bar&quot;}</code></p>
+<h2>Other Aspects</h2>
+<p>A <a href="ccm.types.html#.resource_obj">resource object</a> passed to <a href="ccm.html#.load">ccm.load</a> is cloned to prevent external manipulations.</p>
+<p>In a <a href="ccm.types.html#.resource_obj">resource object</a>, the reference to an <a href="ccm.types.html#.instance">instance</a> can also be passed for the property <code>context</code>.
+The resource is then loaded into the <a href="https://en.wikipedia.org/wiki/Web_Components#Shadow_DOM">Shadow DOM</a> of the <a href="ccm.types.html#.instance">instance</a>.</p>
+<p>When a resource is loaded into a specific context, care must be taken that this context has <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction">DOM</a> contact.
+The chosen context should not be an on-the-fly element or part of it.
+This is required so that the HTML element used to load the resource is evaluated by the browser.</p>
+</article>
+
+</section>
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+	<p style='text-align:center'>This Documentation is written by the Developer of <i>ccmjs</i>: <a href='mailto:andre.kless@web.de'>André Kless</a></p>
+
+
+	<span class="copyright">
+	<a href='https://en.wikipedia.org/wiki/MIT_License'>MIT Licence</a>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a>
+	
+		on 2020-10-02T16:03:55+02:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

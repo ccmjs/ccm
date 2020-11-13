@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>ccmjs Namespace: ccm</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cerulean.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">ccmjs</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="ccm.html">ccm</a></li><li><a href="ccm.helper.html">ccm.helper</a></li><li><a href="ccm.types.html">ccm.types</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="tutorial-backwards-compatibility.html">Backwards Compatibility</a></li><li><a href="tutorial-data-management.html">Data Management</a></li><li><a href="tutorial-html-templating.html">HTML Templating</a></li><li><a href="tutorial-instance-communication.html">Instance Communication</a></li><li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li><li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Namespace: ccm</h1>
+<section>
+
+<header>
+    
+        <h2>
+        ccm
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Everything around <em>ccmjs</em> is capsuled in the single global namespace <code>window.ccm</code>.
+The namespace contains the latest version of <em>ccmjs</em> that has been loaded so far within the webpage.
+In the webpage a <em>ccmjs</em> version is represented as a JavaScript object.
+The object provides methods for <a href="tutorial-usage-of-components.html">using components</a>, <a href="tutorial-loading-of-resources.html">loading of resources</a> and <a href="tutorial-data-management.html">data management</a>.
+For <a href="tutorial-backwards-compatibility.html">backwards compatibility</a> each <em>ccmjs</em> version loaded on the webpage so far has its own inner namespace within <code>window.ccm</code>.
+This ensures that different versions of <em>ccmjs</em> can be used without conflict within the same webpage.</p></div>
+        
+
+        
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-491">line 491</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Namespaces</h3>
+
+        <dl>
+            <dt><a href="namespaces.html#ccm.helper"><a href="ccm.helper.html">helper</a></a></dt>
+            <dd></dd>
+        
+            <dt><a href="namespaces.html#ccm.types"><a href="ccm.types.html">types</a></a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id=".callbacks">
+    <h4 id=".callbacks"><span class="type-signature">&lt;static> </span>callbacks<span class="type-signature"> :Object.&lt;string, function()></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>JSONP callbacks for cross domain data exchanges via <a href="ccm.html#.load">ccm.load</a> are temporarily stored here (is always emptied directly).
+This global namespace <code>ccm.callbacks</code> is also used for dynamic loading of JavaScript modules.
+The namespace is only used internally by <em>ccmjs</em> and should not used by component developers.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object.&lt;string, function()></span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-467">line 467</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".components">
+    <h4 id=".components"><span class="type-signature">&lt;static> </span>components<span class="type-signature"> :Object</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Global namespace under which each registered component can provide public data and functions to the webpage under its unique <a href="ccm.types.html#.component_index">component index</a>.
+This namespace is helpful to see which component version is already registered in which <em>ccmjs</em> version within the webpage.
+The namespace is usually not used by component developers.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1558">line 1558</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">{  &#x27;chat-1-0-2&#x27;: {    valid: true  },  &#x27;quiz-1-0-0&#x27;: {    foo: &#x27;bar&#x27;,    sayHello: name =&gt; console.log( &#x27;Hello &#x27; + name )  },  &#x27;quiz-2-1-0&#x27;: {    n: 5711  }};</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".files">
+    <h4 id=".files"><span class="type-signature">&lt;static> </span>files<span class="type-signature"> :Object</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Result data of loaded JavaScript files via <a href="ccm.html#.load">ccm.load</a> are temporarily stored here (is always emptied directly).
+The namespace is only used internally by <em>ccmjs</em> and should not used by component developers.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-477">line 477</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".timeout">
+    <h4 id=".timeout"><span class="type-signature">&lt;static> </span>timeout<span class="type-signature"> :number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Timeout limit (in ms) for a resource loaded via <a href="ccm.html#.load">ccm.load</a> (default: no timeout).</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-2811">line 2811</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id=".component"><span class="type-signature">&lt;static> </span>component(component [, config])</h4>
+    
+    
+    <p class="summary"><p>registers a component</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Registers a component within this <em>ccmjs</em> version. The returned <a href="ccm.types.html#.component_obj">component object</a> can than be used for flexible <a href="ccm.types.html#.instance">instance</a> creation.
+This method can be used to define dependencies to other components in <a href="ccm.types.html#.instance_config">instance configurations</a>.
+After registration, the component is ready to use on the webpage.
+If a URL to a component file is passed instead of a <a href="ccm.types.html#.component_obj">component object</a>, the object is determined by loading this file.
+If the component uses a different <em>ccmjs</em> version, this version is loaded (if not already present) and then the component is registered in that <em>ccmjs</em> version instead.
+With the <code>config</code> parameter you can pass a default <a href="ccm.types.html#.instance_config">instance configuration</a> that will be integrated with higher priority in the default <a href="ccm.types.html#.instance_config">instance configuration</a> that is defined by the component.
+The resulting default configuration applies for all <a href="ccm.types.html#.instance">instances</a> that are created via the returned <a href="ccm.types.html#.component_obj">component object</a>.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>component</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ccm.types.html#.component_obj">ccm.types.component_obj</a></span>
+|
+
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>component object or URL of a component file</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ccm.types.html#.instance_config">ccm.types.instance_config</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>default configuration for instances that are created out of the component (check documentation of associated component to see which properties could be set)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-981">line 981</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>cloned component object (the original cannot be reached from the outside for security reasons)</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ccm.types.html#.component_obj">ccm.types.component_obj</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="sunlight-highlight-javascript">const component_obj = await ccm.component( {  name: &#x27;blank&#x27;,  ccm: &#x27;https://ccmjs.github.io/ccm/ccm.js&#x27;,  Instance: function () {    this.start = async () =&gt; {      this.element.innerHTML = &#x27;Hello, World!&#x27;;    };  }} );const instance = await component_obj.instance( { root: document.body } );await instance.start();</pre>
+
+    <pre class="sunlight-highlight-javascript">const component_obj = await ccm.component(  &#x27;https://ccmjs.github.io/akless-components/blank/ccm.blank.js&#x27;);const instance = await component_obj.instance( { root: document.body } );await instance.start();</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".get"><span class="type-signature">&lt;static> </span>get( [config] [, key_or_query])</h4>
+    
+    
+    <p class="summary"><p>reads a dataset of a datastore</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This method does the same as <a href="ccm.html#.store">ccm.store</a> with the difference that a <a href="ccm.types.html#.dataset">dataset</a> is directly read from the datastore.
+The dataset is returned as result. Use this method if you only read a dataset once and then need no further access to the datastore.
+This method can be used to define dependencies to other datasets in <a href="ccm.types.html#.instance_config">instance configurations</a>.
+In order to read only a certain subset of a dataset, the dot notation can be used in the <code>key_or_query</code> parameter.
+Then the complete dataset is read but the result is only the requested subset.
+If a query is passed instead of a <a href="ccm.types.html#.dataset_key">dataset key</a>, several datasets can be loaded.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>datastore accessor configuration</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>key_or_query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ccm.types.html#.key">ccm.types.key</a></span>
+|
+
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>either a dataset key or a query to read several datasets (default: read all datasets)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1517">line 1517</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-data-management.html">Data Management</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(<a href="ccm.types.html#.dataset">ccm.types.dataset</a>|Array.&lt;<a href="ccm.types.html#.dataset">ccm.types.dataset</a>>)></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".instance"><span class="type-signature">&lt;static> </span>instance(component [, config])</h4>
+    
+    
+    <p class="summary"><p>registers a component and creates an instance out of it</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This method does the same as <a href="ccm.html#.component">ccm.component</a> with the difference that an <a href="ccm.types.html#.instance">instance</a> is created directly from the component after the registration.
+The created <a href="ccm.types.html#.instance">instance</a> is returned as result. Whenever the start method of the <a href="ccm.types.html#.instance">instance</a> is called, the <a href="ccm.types.html#.instance">instance</a> begins to design the webpage area assigned to it.
+This method can be used to define dependencies to other <a href="ccm.types.html#.instance">instances</a> in <a href="ccm.types.html#.instance_config">instance configurations</a>.
+The given <a href="ccm.types.html#.instance_config">instance configuration</a> will be integrated with higher priority in the default <a href="ccm.types.html#.instance_config">instance configuration</a> that is defined by the component.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>component</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ccm.types.html#.component_obj">ccm.types.component_obj</a></span>
+|
+
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>component object or URL of a component file</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>instance configuration (check documentation of associated component to see which properties could be set)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1101">line 1101</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ccm.types.html#.instance">ccm.types.instance</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="sunlight-highlight-javascript">const instance = await ccm.instance( {  name: &#x27;blank&#x27;,  ccm: &#x27;https://ccmjs.github.io/ccm/ccm.js&#x27;,  Instance: function () {    this.start = async () =&gt; {      this.element.innerHTML = &#x27;Hello, World!&#x27;;    };  }}, { root: document.body } );await instance.start();</pre>
+
+    <pre class="sunlight-highlight-javascript">const instance = await ccm.instance(  &#x27;https://ccmjs.github.io/akless-components/blank/ccm.blank.js&#x27;,  { root: document.body });await instance.start();</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".load"><span class="type-signature">&lt;static> </span>load(resources)</h4>
+    
+    
+    <p class="summary"><p>loads resources</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><em>ccmjs</em> provides a service for asynchronous loading of resources. It could be used with the method <code>ccm.load</code>.
+You can load resources like HTML, CSS, Images, JavaScript, Modules, JSON and XML data on-demand and cross-domain.
+On a single call several resources can be loaded at once. It can be flexibly controlled which resources are loaded in serial and which in parallel.
+See <a href="tutorial-loading-of-resources.html">Loading of Resources</a> to learn everything about this method. There are also more examples how to use it.
+This method can be used to define dependencies to other resources in <a href="ccm.types.html#.instance_config">instance configurations</a>.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>resources</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type"><a href="ccm.types.html#.resource_obj">ccm.types.resource_obj</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>resources data</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-505">line 505</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-loading-of-resources.html">Loading of Resources</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".start"><span class="type-signature">&lt;static> </span>start(component [, config])</h4>
+    
+    
+    <p class="summary"><p>registers a component, creates an instance out of it and starts the instance</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This method does the same as <a href="ccm.html#.instance">ccm.instance</a> with the difference that the created <a href="ccm.types.html#.instance">instance</a> is started directly.
+See <a href="tutorial-usage-of-components.html">Usage of Components</a> to learn everything about <em>ccmjs</em>-based components and their instances.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>component</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ccm.types.html#.component_obj">ccm.types.component_obj</a></span>
+|
+
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>component object or URL of a component file</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>instance configuration (check documentation of associated component to see which properties could be set)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1450">line 1450</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-usage-of-components.html">Usage of Components</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ccm.types.html#.instance">ccm.types.instance</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="sunlight-highlight-javascript">const instance = await ccm.start( {  name: &#x27;blank&#x27;,  ccm: &#x27;https://ccmjs.github.io/ccm/ccm.js&#x27;,  Instance: function () {    this.start = async () =&gt; {      this.element.innerHTML = &#x27;Hello, World!&#x27;;    };  }}, { root: document.body } );</pre>
+
+    <pre class="sunlight-highlight-javascript">const instance = await ccm.start(  &#x27;https://ccmjs.github.io/akless-components/blank/ccm.blank.js&#x27;,  { root: document.body });</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".store"><span class="type-signature">&lt;static> </span>store( [config])</h4>
+    
+    
+    <p class="summary"><p>provides access to a datastore</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><em>ccmjs</em> provides a service for data management. It could be used with this method.
+Use the methods <code>get</code>, <code>set</code> and <code>del</code> of the result object to create, read, update or delete datasets in the datastore.
+This method can be used to define dependencies to other datastores in <a href="ccm.types.html#.instance_config">instance configurations</a>.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>datastore accessor configuration</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1467">line 1467</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+	<dt class="tag-tutorial method-doc-label method-doc-details-label">Tutorials:</dt>
+	<dd class="tag-tutorial">
+		<ul>
+			<li><a href="tutorial-data-management.html">Data Management</a></li>
+			</ul>
+	</dd>
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>datastore accessor</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;ccm.types.datastore></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".version"><span class="type-signature">&lt;static> </span>version()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns the <em>ccmjs</em> version.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="ccm.js.html">ccm.js</a>,
+				 <a href="ccm.js.html#sunlight-1-line-1536">line 1536</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="ccm.types.html#.version_nr">ccm.types.version_nr</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+	<p style='text-align:center'>This Documentation is written by the Developer of <i>ccmjs</i>: <a href='mailto:andre.kless@web.de'>André Kless</a></p>
+
+
+	<span class="copyright">
+	<a href='https://en.wikipedia.org/wiki/MIT_License'>MIT Licence</a>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a>
+	
+		on 2020-10-02T16:03:55+02:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
