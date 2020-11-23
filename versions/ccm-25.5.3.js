@@ -441,7 +441,7 @@
      * @param {Object} params - data to be sent to server
      * @returns {Promise}
      */
-    function useWebsocket( params ) { return new Promise( resolve => {
+    function useWebsocket( params ) { return new Promise( ( resolve, reject ) => {
 
       const key = self.helper.generateKey();
       callbacks[ key ] = result => Number.isInteger( result ) ? checkError( result, reject ) : resolve( result );
