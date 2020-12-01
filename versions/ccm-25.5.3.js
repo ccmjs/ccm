@@ -446,7 +446,12 @@
       const key = self.helper.generateKey();
       callbacks[ key ] = result => Number.isInteger( result ) ? checkError( result, reject ) : resolve( result );
       params.callback = key;
-      that.socket.send( self.helper.stringify( params ) );
+      try {
+        that.socket.send( self.helper.stringify( params ) );
+      }
+      catch ( e ) {
+        prepareRealtime().then( () => that.socket.send( self.helper.stringify( params ) ) );
+      }
 
     } ); }
 
