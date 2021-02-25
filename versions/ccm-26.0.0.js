@@ -1157,7 +1157,7 @@
       }
 
       // convert Light DOM to Element Node
-      config.inner = ccm.helper.html( config.inner, { no_evaluation: true } );
+      config.inner = ccm.helper.html( config.inner, undefined, { no_evaluation: true } );
 
       // integrate config in created ccm instance
       Object.assign( instance, config );
