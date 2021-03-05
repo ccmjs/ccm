@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.2.0)
+ * @version 26.2.0
  * @changes
  * version 26.2.0 (05.03.2021)
  * - send of realm and token on datastore operations can be disabled with realm:null
