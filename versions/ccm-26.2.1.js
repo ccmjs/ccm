@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.2.1)
+ * @version 26.2.1
  * @changes
  * version 26.2.1 (26.03.2021)
  * - automatic reconnect when websocket connection is in closing or closed state
