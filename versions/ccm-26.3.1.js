@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.3.1)
+ * @version 26.3.1
  * @changes
  * version 26.3.1 (16.04.2021)
  * - bugfix for reconnection on closed websocket
