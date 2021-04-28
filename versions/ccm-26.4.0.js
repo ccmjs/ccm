@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.4.0)
+ * @version 26.4.0
  * @changes
  * version 26.4.0 (28.04.2021)
  * - focusable website area (allows component-specific keyboard events)
