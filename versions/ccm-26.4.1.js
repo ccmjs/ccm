@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.4.1)
+ * @version 26.4.1
  * @changes
  * version 26.4.1 (15.07.2021)
  * - simplified dynamic loading of modules with import()
@@ -530,7 +530,7 @@
      * @description Returns the _ccmjs_ version.
      * @returns {ccm.types.version_nr}
      */
-    version: () => '26.4.0',
+    version: () => '26.4.1',
 
     /**
      * @summary loads resources
