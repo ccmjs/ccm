@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.4.2)
+ * @version 26.4.2
  * @changes
  * version 26.4.2 (19.07.2021)
  * - accept also a 403 status code for unauthorized data operations to trigger login
