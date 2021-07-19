@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.4.3)
+ * @version 26.4.3
  * @changes
  * version 26.4.3 (19.07.2021)
  * - updated ccm.helper.isSubset: added check with regular expression, check for truthy and check for deep properties
