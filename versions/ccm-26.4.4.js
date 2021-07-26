@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (26.4.4)
+ * @version 26.4.4
  * @changes
  * version 26.4.4 (26.07.2021)
  * - correct starting point for relative paths when dynamically loading modules
