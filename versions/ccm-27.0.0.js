@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (27.0.0)
+ * @version 27.0.0
  * @changes
  * version 27.0.0 (24.09.2021)
  * - a source configuration is stored at property 'src' instead of 'key'
