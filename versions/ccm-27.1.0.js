@@ -2156,7 +2156,7 @@
         if ( element.tagName.startsWith( 'CCM-' ) && !advanced.no_evaluation ) {
           const config = ccm.helper.generateConfig( element );
           config.root = element;
-          ( config.ccm ? window.ccm[ config.ccm ] : window.ccm ).start( element.tagName === 'CCM-APP' ? element.getAttribute( 'component' ) : element.tagName.substr( 4 ).toLowerCase(), config );
+          ( config.ccm && config.ccm !== 'latest' ? window.ccm[ config.ccm ] : window.ccm ).start( element.tagName === 'CCM-APP' ? element.getAttribute( 'component' ) : element.tagName.substr( 4 ).toLowerCase(), config );
         }
 
         // return generated HTML
@@ -2868,7 +2868,7 @@
             return;
         const config = ccm.helper.generateConfig( this );
         config.root = this;
-        await ( config.ccm ? window.ccm[ config.ccm ] : window.ccm ).start( this.tagName === 'CCM-APP' ? config.component : name, config );
+        await ( config.ccm && config.ccm !== 'latest' ? window.ccm[ config.ccm ] : window.ccm ).start( this.tagName === 'CCM-APP' ? config.component : name, config );
       }
     } );
 
@@ -2916,7 +2916,7 @@
     // should use other ccmjs version? => change used ccmjs version in component object
     const source = ( config && config.ccm ) || ( component.config && component.config.ccm );
     if ( source ) {
-      component.ccm = window.ccm[ source ] || window.ccm[ ( await ccm.helper.loadVersion( source ) ).version() ];
+      component.ccm = source === 'latest' ? window.ccm : window.ccm[ source ] || window.ccm[ ( await ccm.helper.loadVersion( source ) ).version() ];
       component.ccm.url = ccm.helper.isObject( source ) ? source.url : source;        // (considers backward compatibility)
       config && delete config.ccm; component.config && delete component.config.ccm
     }
