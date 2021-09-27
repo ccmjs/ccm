@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (27.1.0)
+ * @version 27.1.0
  * @changes
  * version 27.1.0 (27.09.2021)
  * - added attribute 'ccm' for <ccm-app> to define used version of ccmjs (<ccm-app ccm="27.1.0" component="..." src="...">)
