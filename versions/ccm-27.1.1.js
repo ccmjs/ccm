@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (27.1.1)
+ * @version 27.1.1
  * @changes
  * version 27.1.1 (28.09.2021)
  * - an instance created with ccm.start() is ready AFTER instance.start() is finished
