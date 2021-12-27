@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2021
  * @license The MIT License (MIT)
- * @version latest (27.1.2)
+ * @version 27.1.2
  * @changes
  * version 27.1.2 (27.12.2021)
  * - highestByProperty() and nearestByProperty() returns null if there is no start instance
