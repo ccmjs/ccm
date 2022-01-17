@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2022
  * @license The MIT License (MIT)
- * @version latest (27.2.0)
+ * @version 27.2.0
  * @changes
  * version 27.2.0 (17.01.2022)
  * - ccm.helper.isSubset() can check if a property not exists with value 'null'
