@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2022
  * @license The MIT License (MIT)
- * @version latest (27.3.0)
+ * @version 27.3.0
  * @changes
  * version 27.3.0 (14.02.2022)
  * - ccm.helper.html() accept instance reference and uses instance.element.innerHTML in this case
