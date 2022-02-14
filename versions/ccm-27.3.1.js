@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2022
  * @license The MIT License (MIT)
- * @version latest (27.3.1)
+ * @version 27.3.1
  * @changes
  * version 27.3.1 (14.02.2022)
  * - store.set() returns the created/updated dataset instead of the dataset key
