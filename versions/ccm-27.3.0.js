@@ -8,7 +8,7 @@
  * @version 27.3.0
  * @changes
  * version 27.3.0 (14.02.2022)
- * - ccm.helper.html() accept instance reference and uses instance.element.innerHTML in this case
+ * - ccm.helper.html() accepts a instance reference and returns it as result
  * version 27.2.0 (17.01.2022)
  * - ccm.helper.isSubset() can check if a property not exists with value 'null'
  * version 27.1.2 (27.12.2021)
@@ -2068,17 +2068,14 @@
        */
       html: function ( html, ...values ) {
 
-        // no HTML? => abort
-        if ( !html ) return html;
+        // no HTML or is instance? => let it be
+        if ( !html || ccm.helper.isInstance( html ) ) return html;
 
         // is already a HTML element and no placeholders have to be replaced? => nothing to do
         if ( ccm.helper.isElement( html ) && !values.length ) return html;
 
         // is function that returns a lit-html template result?
         if ( typeof html === 'function' ) return html.apply( this, values );
-
-        // is an instance? => use instance element
-        if ( ccm.helper.isInstance( html ) ) html = html.element.innerHTML;
 
         // handle advanced settings
         let advanced = {};
