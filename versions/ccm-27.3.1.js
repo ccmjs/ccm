@@ -8,7 +8,7 @@
  * @version 27.3.1
  * @changes
  * version 27.3.1 (14.02.2022)
- * - store.set() returns the created/updated dataset instead of the dataset key
+ * - store.set() and store.del() returns original operation result
  * version 27.3.0 (14.02.2022)
  * - ccm.helper.html() accepts a instance reference and returns it as result
  * version 27.2.0 (17.01.2022)
@@ -281,7 +281,9 @@
       /** deletes dataset in local cache */
       function localCache() {
 
-        delete that.local[ key ]; resolve( true );
+        const dataset = that.local[ key ];
+        delete that.local[ key ];
+        resolve( dataset );
 
       }
 
@@ -289,7 +291,7 @@
       function clientDB() {
 
         const request = getStore().delete( key );
-        request.onsuccess = event => event.target.result === undefined ? resolve( true ) : reject( event.target.result );
+        request.onsuccess = event => resolve( event.target.result );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
@@ -297,7 +299,7 @@
       /** deletes dataset in server-side database */
       function serverDB() {
 
-        ( that.socket ? useWebsocket : useHttp )( prepareParams( { del: key } ) ).then( response => ( response === true ? resolve : reject )( response ) ).catch( error => checkError( error, reject ) );
+        ( that.socket ? useWebsocket : useHttp )( prepareParams( { del: key } ) ).then( resolve ).catch( error => checkError( error, reject ) );
 
       }
 
