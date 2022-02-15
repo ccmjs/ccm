@@ -251,7 +251,7 @@
       function clientDB() {
 
         const request = getStore().put( priodata );
-        request.onsuccess = event => event.target.result.toString() === priodata.key.toString() ? resolve( event.target.result ) : reject( event.target.result );
+        request.onsuccess = event => resolve( event.target.result );
         request.onerror   = event => reject( event.target.errorCode );
 
       }
@@ -259,7 +259,7 @@
       /** creates/updates dataset in server-side database */
       function serverDB() {
 
-        ( that.socket ? useWebsocket : useHttp )( prepareParams( { set: priodata } ) ).then( response => ( ccm.helper.isObject( priodata.key ) || response.key.toString() === priodata.key.toString() ? resolve : reject )( response ) ).catch( error => checkError( error, reject ) );
+        ( that.socket ? useWebsocket : useHttp )( prepareParams( { set: priodata } ) ).then( resolve ).catch( error => checkError( error, reject ) );
 
       }
 
