@@ -2397,6 +2397,69 @@
       },
 
       /**
+        * Checks strictly if two items are equal.
+        * Their types are also matter. e.g: isEqual(23, "23") // returns false.
+        * @param  {*} obj1 The first item to compare.
+        * @param  {*} obj2 The second item to compare.
+        * @return {Boolean} Returns true if they're equal in value.
+        */
+      isEqual: (obj1, obj2) => {
+        /**
+         * Check/Get the exact type of given JavaScript object.
+         * @param  {Object} item The given object, which type to find.
+         * @return {String}     The given object's exact type.
+         */
+        function getType (item) {
+          return Object.prototype.toString.call(item).slice(8, -1).toLowerCase(); // Gets the type of given item
+        }
+        function compareArrays () {
+          // Check first the length of two items
+          if (obj1.length !== obj2.length) return false;
+          // Check each item in the array one by one
+          for (let i = 0; i < obj1.length; i++) {
+            if (!isEqual(obj1[i], obj2[i])) return false;
+          }
+          // If no errors occurs, return true
+          return true;
+        }
+
+        function compareObjects() {
+          // Check the length of two objects
+          if (Object.keys(obj1).length !== Object.keys(obj2).length) return false;
+          // Check each item in the object one by one
+          for (let key in obj1) {
+            if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+              if (!isEqual(obj1[key], obj2[key])) return false;
+            }
+          }
+          // If no errors occurs, return true
+          return true;
+        }
+
+        // Compare functions from their representing objects
+        function compareFunctions () {
+          return obj1.toString() === obj2.toString();
+        }
+
+        // Compare basic primitive type of elements
+        function comparePrimitives() {
+          return obj1 === obj2;
+        }
+
+        // Get the type of first argument
+        let type = getType(obj1);
+
+        // If the two items are not the same type, return false
+        if (type !== getType(obj2)) return false;
+
+        // Compare the two items based on their type
+        if (type === 'array') return compareArrays();
+        if (type === 'object') return compareObjects();
+        if (type === 'function') return compareFunctions();
+        return comparePrimitives();
+      },
+
+      /**
        * @summary checks if a value is a _ccmjs_ ccmjs object
        * @param {*} value - value to check
        * @returns {boolean}
