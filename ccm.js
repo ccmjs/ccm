@@ -2616,6 +2616,27 @@
       ),
 
       /**
+       * Creates a random number from the given minimum and maximum number arguments.
+       * This function works also with negative numbers
+       * @param {Number} min Some number, which represents the minimum limit of the range
+       * @param {Number} max Some number, which represents the maximum limit of the range
+       */
+      randomFromRange: (min, max) => {
+        if(isNaN(min)) throw new Error("Your min value " + min + " is actually not a number!" )
+        if(isNaN(max)) throw new Error("Your max value " + max + " is actually not a number!" )
+
+        // Find the difference between two numbers
+        if(max <= min) {
+          throw new Error("Your minimum number(" + min + ") is great than or equal to your maximum number (" + max + ").")
+        } else {
+          const differ = max - min; // Find the difference between numbers
+          const random = Math.floor(Math.random() * differ); // Create the random number from difference and Math library, and then floor their multiply.
+
+          return min + random; // Add random number to the minimum, in order to create a random number from the range.
+        }
+      },
+
+      /**
        * @summary get a _ccmjs_ relevant regular expression
        * @description
        * Possible index values, it's meanings and it's associated regular expressions:
