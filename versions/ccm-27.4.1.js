@@ -5,7 +5,7 @@
  * and defines the Custom Element <code>\<ccm-app\></code>.
  * @author André Kless <andre.kless@web.de> 2014-2022
  * @license The MIT License (MIT)
- * @version latest (27.4.1)
+ * @version 27.4.1
  * @changes
  * version 27.4.1 (20.10.2022)
  * - bugfix in ccm.helper.html for checked checkboxes
