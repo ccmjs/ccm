@@ -2258,7 +2258,7 @@
         [ ...html.childNodes ].forEach( child => {
           if ( child.nodeType === Node.COMMENT_NODE )
             return child.parentNode.removeChild( child );
-          if ( child.nodeValue && !child.parentElement.closest( 'pre' ) )
+          if ( child.nodeValue && !child.parentElement?.closest( 'pre' ) )
             child.nodeValue = child.nodeValue.replace( /\s+/g, ' ' );
           if ( ccm.helper.isElement( child ) || child.nodeValue.trim() )
             json.inner.push( ccm.helper.isElement( child ) ? ccm.helper.html2json( child ) : child.textContent );
