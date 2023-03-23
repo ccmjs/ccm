@@ -1,0 +1,23 @@
+{
+  "name": "se",
+  "version": "1.0.0",
+  "description": "Mobile Web-App für die Lehrveranstaltung \"Software Engineering 1\"",
+  "main": "configs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ccmjs/se.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ccmjs/se/issues"
+  },
+  "homepage": "https://github.com/ccmjs/se#readme",
+  "devDependencies": {
+    "csso": "^5.0.5",
+    "terser": "^5.16.6"
+  }
+}
