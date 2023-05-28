@@ -207,7 +207,7 @@ With each deeper array level you switch between serial and parallel loading:</p>
     'image.png',
     [
       'data.json',  // Array Level 2: Parallel
-      'script.js'
+      'script.mjs'
     ],
     'logo.gif'
   ],
@@ -240,7 +240,7 @@ With each deeper array level you switch between serial and parallel loading:</p>
 <td>------------******------</td>
 </tr>
 <tr>
-<td><code>script.js</code></td>
+<td><code>script.mjs</code></td>
 <td>------------******------</td>
 </tr>
 <tr>
@@ -335,10 +335,10 @@ The JavaScript is loaded by adding a <code>&lt;script src=&quot;url&quot; async&
 Loading of JavaScript resolves, when the <code>onload</code> event of the <code>&lt;script&gt;</code> tag fires.
 After the JavaScript code has executed, the no more needed <code>&lt;script&gt;</code> tag will be removed from the <a href="https://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>.
 The result value is the URL of the JavaScript file, but the loaded JavaScript code can also set the result individually:</p>
-<pre class="prettyprint source lang-javascript"><code>/* script.js */
-ccm.files[ 'script.js' ] = { foo: 'bar' };
+<pre class="prettyprint source lang-javascript"><code>/* script.mjs */
+ccm.files[ 'script.mjs' ] = { foo: 'bar' };
 </code></pre>
-<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'script.js' );
+<pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'script.mjs' );
 console.log( result );  // => { &quot;foo&quot;: &quot;bar&quot; }
 </code></pre>
 <p>The result value of a loaded JavaScript file is what the contained JavaScript code puts in <code>ccm.files[ 'filename' ]</code>, where <code>filename</code> is the filename of the JavaScript file.
@@ -347,7 +347,7 @@ Using this convention, a JavaScript file can provide data across domains.
 The publicly fetched data in the global namespace <a href="ccm.html#.files">ccm.files</a> will be directly deleted.
 In case of a minimized JavaScript file, the <code>.min</code> in the filename can be omitted:</p>
 <pre class="prettyprint source lang-javascript"><code>/* script.min.js */
-ccm.files['script.js']={foo:'bar'};
+ccm.files['script.mjs']={foo:'bar'};
 </code></pre>
 <pre class="prettyprint source lang-javascript"><code>const result = await ccm.load( 'script.min.js' );
 console.log( result );  // => { &quot;foo&quot;: &quot;bar&quot; }
@@ -355,13 +355,13 @@ console.log( result );  // => { &quot;foo&quot;: &quot;bar&quot; }
 <p>With the <code>attr</code> property of a <a href="ccm.types.html#.resource_obj">resource object</a> you can add additional HTML attributes to the <code>&lt;script&gt;</code> tag.
 For example this allows you to load JavaScript with <a href="https://developer.mozilla.org/de/docs/Web/Security/Subresource_Integrity">Subresource Integrity</a>:</p>
 <pre class="prettyprint source lang-javascript"><code>await ccm.load( {
-  url: 'script.js',
+  url: 'script.mjs',
   attr: {
     integrity: 'sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW',
     crossorigin: 'anonymous'
   }
 } );
-// &lt;script src=&quot;script.js&quot; async integrity=&quot;sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW&quot; crossorigin=&quot;anonymous&quot;>
+// &lt;script src=&quot;script.mjs&quot; async integrity=&quot;sha384-QoLtnRwWkKw2xXw4o/pmW2Z1Zwst5f16sRMbRfP/Ova1nnEN6t2xUwiLOZ7pbbDW&quot; crossorigin=&quot;anonymous&quot;>
 </code></pre>
 <h2>Loading of Modules</h2>
 <p>Loading a module gives you an object as result that contains all the exported members of the module:</p>
