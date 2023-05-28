@@ -3,9 +3,10 @@
  * Core script of _ccmjs_ that is automatically loaded as soon as a component is integrated into a webpage.
  * The core script sets an object in the namespace [window.ccm]{@link ccm} that represents the loaded _ccmjs_ version
  * and defines the Custom Element <code>\<ccm-app\></code>.
- * @author André Kless <andre.kless@web.de> 2014-2023
+ * @author André Kless <andre.kless@web.de> (https://github.com/akless)
  * @license The MIT License (MIT)
- * @version latest (27.5.0)
+ * @version 27.5.0
+ * @domain https://ccmjs.github.io/ccm/
  * @changes
  * version 27.5.0 (23.03.2023)
  * - added third parameter: ccm.start(component,config,element)
@@ -166,7 +167,7 @@
 
     /**
      * returns datastore source information
-     * @returns {Object}
+     * @returns {{name: string, url: string, db: string}}
      */
     this.source = () => { return { name: that.name, url: that.url, db: that.db } };
 
@@ -2507,15 +2508,16 @@
        *   'values.1': 123,               // check of deeper array value
        *   'settings.title': 'Welcome!',  // check of deeper object value
        *   onLoad: true,                  // checks for truthy (is not falsy)
-       *   search: 'foo,bar,baz'          // checks with regular expression
+       *   search: '/foo,bar,baz/',       // checks with regular expression
+       *   title: null                    // checks if property does not exist
        * };
        * const other = {
        *   name: 'John Doe',
        *   counter: 3,
        *   isValid: true,
+       *   x: { y: 'z' },
        *   values: [ 'abc', 123, false ],
        *   settings: { title: 'Welcome!', year: 2017, greedy: true },
-       *   x: { y: 'z' },
        *   onLoad: function () { console.log( 'Loading..' ); },
        *   search: 'foo,bar,baz'
        * };
