@@ -1596,7 +1596,7 @@ ccm = function () {
             component.render( config );
 
           };
-          document.registerElement( 'ccm-' + component.index, { prototype: tag } );
+          try { document.registerElement( 'ccm-' + component.index, { prototype: tag } ); } catch ( err ) {}
 
         }
 

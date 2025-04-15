@@ -1495,7 +1495,7 @@ ccm = function () {
             config.element = jQuery( this );
             component.render( config );
           };
-          document.registerElement( 'ccm-' + component.index, { prototype: tag } );
+          try { document.registerElement( 'ccm-' + component.index, { prototype: tag } ); } catch ( err ) {}
 
         }
 
