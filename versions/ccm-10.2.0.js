@@ -1707,7 +1707,13 @@
             if ( !document.head.attachShadow && !document.head.createShadowRoot ) {
               if ( ccm.shady ) return self.helper.wait( 1000, proceed );
               ccm.shady = true;
-              self.load( 'https://kaul.inf.h-brs.de/ccm/lib/shadydom.min.js', function () { delete ccm.shady; proceed(); } );
+              self.load(
+                "https://ccmjs.github.io/ccm/polyfills/shadydom.min.js",
+                function () {
+                  delete ccm.shady;
+                  proceed();
+                }
+              );
             }
             else return proceed();
 

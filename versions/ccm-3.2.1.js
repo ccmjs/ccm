@@ -110,7 +110,7 @@
  * version 1.0.0 (31.03.2015): result of master thesis
  */
 
-( function () { var remote = true; var domain = remote ? 'https://kaul.inf.h-brs.de/ccm/' : ''; var p = remote ? 'p' : '';
+( function () { var remote = true; var domain = remote ? 'https://ccmjs.github.io/ccm/' : ''; var p = remote ? 'p' : '';
 
 // jQuery not exists? => load jQuery
 if ( !window.jQuery ) {
